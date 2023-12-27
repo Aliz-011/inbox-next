@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  name String @db.Text
+  email String @unique
+  password String @db.Text
+  dateOfBirth DateTime?
+  photoUrl String? @db.Text
+  phone String?
+  address String? @db.Text
+
+  inbox Mail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Mail {
+  id         String   @id @default(uuid())
+  title      String
+  body       String
+  isRead     Boolean  @default(false)
+  isStarred  Boolean  @default(false)
+
+  senderId String
+  sender User @relation(fields: [senderId],references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
