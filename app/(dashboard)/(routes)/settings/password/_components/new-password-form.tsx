@@ -37,7 +37,7 @@ type PasswordFormValues = z.infer<typeof formSchema>;
 export const NewPasswordForm = ({
   currentUser,
 }: {
-  currentUser?: SafeUser | null;
+  currentUser: SafeUser | null;
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -64,7 +64,7 @@ export const NewPasswordForm = ({
       // decrypt
       const originalPassword = await bcrypt.compare(
         currentPassword,
-        currentUser?.password as string
+        currentUser?.password!
       );
 
       if (!originalPassword) {
@@ -77,7 +77,7 @@ export const NewPasswordForm = ({
       const res = await axios.patch('/api/profiles', {
         password: newPassword,
       });
-      if (res.data) {
+      if (res.status === 200) {
         form.reset();
         toast.success('Password updated');
         router.refresh();
@@ -85,6 +85,7 @@ export const NewPasswordForm = ({
       }
     } catch (error: any) {
       console.log(error);
+      toast.error('Something went wrong');
     } finally {
       setIsLoading(false);
     }

@@ -17,6 +17,7 @@ export async function PATCH(req: Request) {
     if (!password) {
       return NextResponse.json({ message: 'No password provided' });
     }
+
     if (!dob) {
       return NextResponse.json({ message: 'No date of birth provided' });
     }

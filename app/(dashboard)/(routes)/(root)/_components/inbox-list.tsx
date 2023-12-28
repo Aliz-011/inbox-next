@@ -2,7 +2,8 @@
 
 import { FilePlus2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { InboxItem } from './inbox-item';
+import { InboxItem, InboxItemSkeleton } from './inbox-item';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const InboxList = () => {
   const router = useRouter();
@@ -22,6 +23,19 @@ export const InboxList = () => {
         </span>
       </div>
       <InboxItem />
+    </div>
+  );
+};
+
+export const InboxListSkeleton = () => {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+      <div className="col-span-full">
+        <Skeleton className="h-8 w-20" />
+      </div>
+      {[...Array(4)].map((_, i) => (
+        <InboxItemSkeleton key={i} />
+      ))}
     </div>
   );
 };

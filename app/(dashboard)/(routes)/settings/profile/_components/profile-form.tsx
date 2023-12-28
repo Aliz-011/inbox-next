@@ -44,7 +44,7 @@ type ProfileFormValues = z.infer<typeof formSchema>;
 export const ProfileForm = ({
   currentUser,
 }: {
-  currentUser?: SafeUser | null;
+  currentUser: SafeUser | null;
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -125,9 +125,7 @@ export const ProfileForm = ({
                         !field.value && 'text-muted-foreground'
                       )}
                     >
-                      {currentUser?.dateOfBirth ? (
-                        format(currentUser?.dateOfBirth, 'PPP')
-                      ) : field.value ? (
+                      {field.value ? (
                         format(field.value, 'PPP')
                       ) : (
                         <span>Pick a date</span>

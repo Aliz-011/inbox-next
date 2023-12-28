@@ -66,7 +66,7 @@ export const MailForm = () => {
           </span>
 
           <span className="sm:ml-3">
-            <Button type="button">Publish</Button>
+            <Button type="button">Create</Button>
           </span>
 
           <div className="relative ml-3 sm:hidden">
