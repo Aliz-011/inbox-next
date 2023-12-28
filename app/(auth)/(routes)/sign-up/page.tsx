@@ -1,12 +1,13 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+import { useTransition } from 'react';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -18,8 +19,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
-import Link from 'next/link';
+import { registerUser } from '@/actions/user.action';
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -32,7 +32,8 @@ const formSchema = z.object({
 
 const SignUp = () => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+
+  const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,27 +45,25 @@ const SignUp = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      setIsLoading(true);
-      const { confirmPassword, ...rest } = values;
-
-      if (values.password !== confirmPassword) {
-        form.setError('confirmPassword', { message: 'Password do not match' });
-        return;
-      }
-
-      await axios.post('/api/registers', {
-        ...rest,
-      });
-
-      toast.success('Account created!');
-      router.push('/sign-in');
-      router.refresh();
-    } catch (error: any) {
-      toast.error(error.response.data.message);
-    } finally {
-      setIsLoading(false);
+    const { confirmPassword, ...rest } = values;
+    if (values.password !== confirmPassword) {
+      form.setError('confirmPassword', { message: 'Password do not match' });
+      return;
     }
+
+    startTransition(() => {
+      registerUser({ ...rest })
+        .then((data) => {
+          if (data.status === 409) {
+            throw new Error(data.message);
+          }
+          toast.success('Account created!');
+          router.push('/sign-in');
+        })
+        .catch((error: any) => {
+          toast.error(error.message);
+        });
+    });
   }
   return (
     <div className="w-2/3">
@@ -90,7 +89,7 @@ const SignUp = () => {
                     <Input
                       placeholder="shadcn@gmail.com"
                       {...field}
-                      disabled={isLoading}
+                      disabled={isPending}
                     />
                   </FormControl>
                   <FormMessage />
@@ -107,7 +106,7 @@ const SignUp = () => {
                     <Input
                       placeholder="shadcn"
                       {...field}
-                      disabled={isLoading}
+                      disabled={isPending}
                     />
                   </FormControl>
                   <FormMessage />
@@ -125,7 +124,7 @@ const SignUp = () => {
                       placeholder="*******"
                       type="password"
                       {...field}
-                      disabled={isLoading}
+                      disabled={isPending}
                     />
                   </FormControl>
                   <FormMessage />
@@ -143,7 +142,7 @@ const SignUp = () => {
                       placeholder="*******"
                       type="password"
                       {...field}
-                      disabled={isLoading}
+                      disabled={isPending}
                     />
                   </FormControl>
                   <FormMessage />
@@ -154,9 +153,9 @@ const SignUp = () => {
           <Button
             type="submit"
             className="w-full flex gap-x-2"
-            disabled={isLoading}
+            disabled={isPending}
           >
-            {isLoading && <Loader2 className="animate-spin h-4 w-4" />}
+            {isPending && <Loader2 className="animate-spin h-4 w-4" />}
             Create account
           </Button>
         </form>

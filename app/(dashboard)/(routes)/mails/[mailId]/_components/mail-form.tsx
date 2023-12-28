@@ -40,7 +40,7 @@ export const MailForm = () => {
           <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
             <div className="mt-2 flex items-center text-sm text-gray-500">
               <FileType2 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" />
-              Mail Type
+              Inbox
             </div>
           </div>
         </div>

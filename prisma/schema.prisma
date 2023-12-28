@@ -21,6 +21,46 @@ model User {
   phone String?
   address String? @db.Text
 
+  sentMails Mail[] @relation(name: "Sender")
+  receivedMails Mail[] @relation(name: "Recipient")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Mail {
+  id String @id @default(uuid())
+  title String
+  content String? @db.Text
+  mailCode String @db.Text
+  isRead Boolean @default(false)
+  isDrafted Boolean @default(false)
+
+  senderId String
+  sender User @relation(name: "Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipientId String
+  recipient User @relation(name: "Recipient", fields: [recipientId], references: [id])
+
+  attachments Attachment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([senderId])
+  @@index([recipientId])
+  @@index([senderId, recipientId])
+}
+
+model Attachment{
+  id String @id @default(uuid())
+  name String
+  url String @db.Text
+
+  mailId String
+  mail Mail @relation(fields: [mailId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([mailId])
 }

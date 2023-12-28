@@ -142,8 +142,8 @@ export const NewPasswordForm = ({
             )}
           />
         </div>
-        <Button type="submit" className="flex gap-x-2" disabled={isLoading}>
-          {isLoading && <Loader2 className="animate-spin h-4 w-4" />}
+        <Button type="submit" disabled={isLoading}>
+          {isLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
           Save changes
         </Button>
       </form>

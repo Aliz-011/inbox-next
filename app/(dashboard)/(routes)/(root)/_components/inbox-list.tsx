@@ -4,8 +4,9 @@ import { FilePlus2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { InboxItem, InboxItemSkeleton } from './inbox-item';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SafeMail } from '@/types';
 
-export const InboxList = () => {
+export const InboxList = ({ mails }: { mails: SafeMail[] }) => {
   const router = useRouter();
 
   return (
@@ -22,7 +23,9 @@ export const InboxList = () => {
           Create new mail
         </span>
       </div>
-      <InboxItem />
+      {mails.length > 0
+        ? mails.map((mail) => <InboxItem key={mail.id} mail={mail} />)
+        : null}
     </div>
   );
 };

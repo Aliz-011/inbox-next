@@ -16,7 +16,7 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) {
-          throw new Error('Invalid credentials');
+          throw new Error('Invalid credentials.');
         }
 
         const user = await prismadb.user.findUnique({
@@ -26,7 +26,7 @@ export const authOptions: AuthOptions = {
         });
 
         if (!user || !user.password) {
-          throw new Error('There is no account with this email');
+          throw new Error('There is no account with this email.');
         }
 
         // decrypt
@@ -36,7 +36,7 @@ export const authOptions: AuthOptions = {
         );
 
         if (!originalPassword) {
-          throw new Error('Invalid password');
+          throw new Error('Invalid password.');
         }
 
         return user;
