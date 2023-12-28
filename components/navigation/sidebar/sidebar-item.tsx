@@ -6,7 +6,6 @@ import { LucideIcon } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { buttonVariants } from '@/components/ui/button';
 
-import { useSidebar } from '@/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
 
 export const SidebarItem = ({
@@ -16,30 +15,30 @@ export const SidebarItem = ({
   icon: Icon,
   isActive,
 }: {
-  title?: string;
-  label: string;
+  title: string;
+  label?: string;
   href: string;
   isActive: boolean;
   icon: LucideIcon;
 }) => {
   const variant = isActive ? 'default' : 'ghost';
-  const { collapsed } = useSidebar((state) => state);
 
   return (
     <Link
       href={href}
       className={cn(
-        buttonVariants({ variant: variant, size: collapsed ? 'icon' : 'sm' }),
+        buttonVariants({ variant: variant, size: 'sm' }),
         variant === 'default' &&
           'dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white',
-        collapsed ? 'justify-center' : 'justify-start'
+        'justify-start'
       )}
     >
-      <Icon className={cn('h-4 w-4', collapsed ? 'mr-0' : 'mr-2')} />
-
-      {!collapsed && (
+      <Icon className="mr-2 h-4 w-4" />
+      {title}
+      {label && (
         <span
           className={cn(
+            'ml-auto',
             variant === 'default' && 'text-background dark:text-white'
           )}
         >

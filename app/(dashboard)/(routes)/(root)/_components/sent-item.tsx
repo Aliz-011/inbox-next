@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { Mail, User } from '@prisma/client';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -12,19 +13,23 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SafeMail } from '@/types';
+import { timeAgo } from '@/lib/utils';
 
-export const InboxItem = ({ mail }: { mail: SafeMail }) => {
+export const SentItem = ({ mail }: { mail: Mail & { recipient: User } }) => {
   const router = useRouter();
 
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between space-y-0 pb-2">
         <div>
-          <CardTitle className="text-sm font-semibold">Dini Abshari</CardTitle>
-          <CardDescription>Meeting tomorrow</CardDescription>
+          <CardTitle className="text-sm font-semibold">
+            {mail.recipient.name}
+          </CardTitle>
+          <CardDescription className="text-xs font-medium">
+            {mail.title}
+          </CardDescription>
         </div>
-        <span className="text-xs font-light">2 months ago</span>
+        <span className="text-xs font-light">{timeAgo(mail.createdAt)}</span>
       </CardHeader>
       <CardContent className="space-y-1">
         <p className="text-xs text-muted-foreground truncate">{mail.content}</p>
@@ -41,7 +46,7 @@ export const InboxItem = ({ mail }: { mail: SafeMail }) => {
   );
 };
 
-export const InboxItemSkeleton = () => {
+export const SentItemSkeleton = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between space-y-0 pb-2">

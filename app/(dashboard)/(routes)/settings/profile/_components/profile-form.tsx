@@ -121,8 +121,7 @@ export const ProfileForm = ({
                 />
               </FormControl>
               <FormDescription>
-                You can <span>@mention</span> other users and organizations to
-                link to them.
+                Maximum characters for address are 160.
               </FormDescription>
               <FormMessage />
             </FormItem>

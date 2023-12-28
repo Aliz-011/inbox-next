@@ -24,12 +24,7 @@ export const getCurrentUser = async () => {
       return redirect('/sign-in');
     }
 
-    return {
-      ...currentUser,
-      createdAt: currentUser.createdAt.toISOString(),
-      updatedAt: currentUser.updatedAt.toISOString(),
-      dateOfBirth: currentUser.dateOfBirth?.toISOString(),
-    };
+    return currentUser;
   } catch (error) {
     return null;
   }

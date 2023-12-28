@@ -25,37 +25,44 @@ import { cn } from '@/lib/utils';
 
 const mainRoutes = [
   {
-    label: 'Dashboard',
+    title: 'Dashboard',
+    label: '',
     href: '/',
     icon: LayoutGrid,
   },
   {
-    label: 'Drafts',
+    title: 'Drafts',
+    label: '',
     href: '/drafts',
     icon: File,
   },
   {
-    label: 'Inbox',
+    title: 'Inbox',
+    label: '2',
     href: '/inbox',
     icon: Inbox,
   },
   {
-    label: 'Sent',
+    title: 'Sent',
+    label: '',
     href: '/sent',
     icon: Send,
   },
   {
-    label: 'Junk',
+    title: 'Junk',
+    label: '',
     href: '/junk',
     icon: ArchiveX,
   },
   {
-    label: 'Trash',
+    title: 'Trash',
+    label: '',
     href: '/trash',
     icon: Trash2,
   },
   {
-    label: 'Archive',
+    title: 'Archive',
+    label: '',
     href: '/archive',
     icon: Archive,
   },
@@ -110,9 +117,9 @@ export const Sidebar = () => {
           <SidebarMenu routes={mainRoutes} />
         </div>
 
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <SidebarMenu routes={secondaryRoutes} />
-        </div>
+        </div> */}
       </aside>
     </TooltipProvider>
   );

@@ -22,15 +22,17 @@ export const CardItem = () => {
 
 export const CardItemSkeleton = () => {
   return (
-    <div>
-      <div className="flex items-center justify-between space-y-0 pb-2">
-        <Skeleton className="h-4 w-24 rounded" />
-        <Skeleton className="rounded-md w-6 h-6" />
-      </div>
-      <div className="space-y-2 mt-2">
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between space-y-0">
+          <Skeleton className="h-4 w-24 rounded" />
+          <Skeleton className="rounded-md w-6 h-6" />
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-2 mt-2">
         <Skeleton className="h-6 w-12 rounded-md" />
         <Skeleton className="h-4 w-20 rounded-md" />
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };

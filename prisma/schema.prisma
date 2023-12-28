@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider          = "prisma-client-js"
 }
 
 datasource db {
@@ -41,7 +41,7 @@ model Mail {
   recipientId String
   recipient User @relation(name: "Recipient", fields: [recipientId], references: [id])
 
-  attachments Attachment[]
+  attachment String? @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -49,18 +49,4 @@ model Mail {
   @@index([senderId])
   @@index([recipientId])
   @@index([senderId, recipientId])
-}
-
-model Attachment{
-  id String @id @default(uuid())
-  name String
-  url String @db.Text
-
-  mailId String
-  mail Mail @relation(fields: [mailId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([mailId])
 }

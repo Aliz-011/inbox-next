@@ -1,6 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { CardListSkeleton } from './_components/card-list';
-import { InboxListSkeleton } from './_components/inbox-list';
+import { SentListSkeleton } from './_components/sent-list';
 
 const RootLoading = () => {
   return (
@@ -10,7 +10,7 @@ const RootLoading = () => {
         <Skeleton className="w-36 h-4 rounded-md" />
       </div>
       <CardListSkeleton />
-      <InboxListSkeleton />
+      <SentListSkeleton />
     </div>
   );
 };

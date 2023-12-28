@@ -1,10 +1,11 @@
 'use server';
 
-import { prismadb } from '@/lib/database';
-import { getCurrentUser } from '@/lib/get-current-user';
-import { User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { revalidatePath } from 'next/cache';
+import { User } from '@prisma/client';
+
+import { prismadb } from '@/lib/database';
+import { getCurrentUser } from '@/lib/get-current-user';
 
 export const updateUser = async (values: Partial<User>) => {
   const currentUser = await getCurrentUser();

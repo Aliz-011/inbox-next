@@ -2,17 +2,21 @@
 
 import { FilePlus2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { InboxItem, InboxItemSkeleton } from './inbox-item';
+import { SentItem, SentItemSkeleton } from './sent-item';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SafeMail } from '@/types';
+import { Mail, User } from '@prisma/client';
 
-export const InboxList = ({ mails }: { mails: SafeMail[] }) => {
+export const SentList = ({
+  mails,
+}: {
+  mails: (Mail & { recipient: User })[];
+}) => {
   const router = useRouter();
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-4">
       <div className="col-span-full">
-        <h2 className="font-semibold text-xl">Inbox</h2>
+        <h2 className="font-semibold text-xl">Sent</h2>
       </div>
       <div
         onClick={() => router.push('/mails/new')}
@@ -24,20 +28,20 @@ export const InboxList = ({ mails }: { mails: SafeMail[] }) => {
         </span>
       </div>
       {mails.length > 0
-        ? mails.map((mail) => <InboxItem key={mail.id} mail={mail} />)
+        ? mails.map((mail) => <SentItem key={mail.id} mail={mail} />)
         : null}
     </div>
   );
 };
 
-export const InboxListSkeleton = () => {
+export const SentListSkeleton = () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
       <div className="col-span-full">
         <Skeleton className="h-8 w-20" />
       </div>
-      {[...Array(4)].map((_, i) => (
-        <InboxItemSkeleton key={i} />
+      {[...Array(3)].map((_, i) => (
+        <SentItemSkeleton key={i} />
       ))}
     </div>
   );
