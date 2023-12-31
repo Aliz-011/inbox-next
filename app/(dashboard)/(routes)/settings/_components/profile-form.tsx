@@ -28,9 +28,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
-import { SafeUser } from '@/types';
 import { cn } from '@/lib/utils';
 import { updateUser } from '@/actions/user.action';
+import { User } from '@prisma/client';
 
 const formSchema = z.object({
   name: z.string().min(5, {
@@ -44,11 +44,7 @@ const formSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof formSchema>;
 
-export const ProfileForm = ({
-  currentUser,
-}: {
-  currentUser: SafeUser | null;
-}) => {
+export const ProfileForm = ({ currentUser }: { currentUser: User | null }) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 

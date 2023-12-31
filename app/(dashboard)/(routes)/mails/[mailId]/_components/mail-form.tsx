@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -43,14 +43,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { Editor } from '@/components/editor';
 
 import { createMail, updateMail } from '@/actions/mail.action';
 import { cn } from '@/lib/utils';
+import { useEdgeStore } from '@/lib/edgestore';
+import { SingleImageDropzone } from '@/components/image-uploader/single-image-dropzone';
+import { Label } from '@/components/ui/label';
 
 const formSchema = z.object({
   title: z.string().min(5),
@@ -70,6 +73,9 @@ export const MailForm = ({
 }) => {
   const router = useRouter();
   const params = useParams();
+  const [file, setFile] = useState<File>();
+  const [url, setUrl] = useState('');
+  const { edgestore } = useEdgeStore();
   const [isPending, startTransition] = useTransition();
 
   const usersCombobox = users.map((user) => ({
@@ -105,6 +111,7 @@ export const MailForm = ({
             }
             toast.success(toastMessage);
             router.refresh();
+            router.push('/');
           });
         });
       } else {
@@ -115,6 +122,7 @@ export const MailForm = ({
             }
             toast.success(toastMessage);
             router.refresh();
+            router.push('/');
           });
         });
       }
@@ -123,6 +131,13 @@ export const MailForm = ({
       toast.error(error.message);
     }
   }
+
+  const onChange = async (file?: File) => {
+    if (file) {
+      const res = await edgestore.publicFiles.upload({ file });
+      setUrl(res.url);
+    }
+  };
 
   return (
     <>
@@ -197,23 +212,87 @@ export const MailForm = ({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="mailCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Mail Code</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="e.g. SK0-xxx"
-                    disabled={isPending}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex flex-col md:flex-row items-center justify-between gap-x-4">
+            <FormField
+              control={form.control}
+              name="mailCode"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Mail Code</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g. SK0-xxx"
+                      className="w-full"
+                      disabled={isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="recipientId"
+              render={({ field }) => (
+                <FormItem className="flex flex-col mt-0 md:mt-2">
+                  <FormLabel>Mail to</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            'w-[200px] justify-between',
+                            !field.value && 'text-muted-foreground'
+                          )}
+                        >
+                          {field.value
+                            ? usersCombobox.find(
+                                (user) => user.value === field.value
+                              )?.label
+                            : 'Select user'}
+                          <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Search user..."
+                          className="h-9"
+                        />
+                        <CommandEmpty>No user found.</CommandEmpty>
+                        <CommandGroup>
+                          {usersCombobox.map((user) => (
+                            <CommandItem
+                              value={user.label}
+                              key={user.value}
+                              onSelect={() => {
+                                form.setValue('recipientId', user.value);
+                              }}
+                            >
+                              {user.label}
+                              <CheckIcon
+                                className={cn(
+                                  'ml-auto h-4 w-4',
+                                  user.value === field.value
+                                    ? 'opacity-100'
+                                    : 'opacity-0'
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
             name="content"
@@ -236,66 +315,37 @@ export const MailForm = ({
               </FormItem>
             )}
           />
-          <FormField
+          {/* <FormField
             control={form.control}
-            name="recipientId"
+            name="content"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          'w-[200px] justify-between',
-                          !field.value && 'text-muted-foreground'
-                        )}
-                      >
-                        {field.value
-                          ? usersCombobox.find(
-                              (user) => user.value === field.value
-                            )?.label
-                          : 'Select user'}
-                        <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput
-                        placeholder="Search user..."
-                        className="h-9"
-                      />
-                      <CommandEmpty>No user found.</CommandEmpty>
-                      <CommandGroup>
-                        {usersCombobox.map((user) => (
-                          <CommandItem
-                            value={user.label}
-                            key={user.value}
-                            onSelect={() => {
-                              form.setValue('recipientId', user.value);
-                            }}
-                          >
-                            {user.label}
-                            <CheckIcon
-                              className={cn(
-                                'ml-auto h-4 w-4',
-                                user.value === field.value
-                                  ? 'opacity-100'
-                                  : 'opacity-0'
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
+              <FormItem>
+                <FormLabel>Content</FormLabel>
+                <Editor
+                  {...field}
+                  content={field.value!}
+                  onChange={field.onChange}
+                />
+                <FormDescription>
+                  You can <span>@mention</span> other users and organizations to
+                  link to them.
+                </FormDescription>
               </FormItem>
             )}
-          />
+          /> */}
+
+          <div className="grid gap-2">
+            <Label>Attachment</Label>
+            <SingleImageDropzone
+              width={400}
+              height={350}
+              value={file}
+              onChange={(file) => {
+                setFile(file);
+              }}
+              disabled={isPending}
+            />
+          </div>
           <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="animate-spin mr-2 h-4 w-4" />}
             {action}

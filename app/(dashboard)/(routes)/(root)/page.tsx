@@ -1,12 +1,15 @@
 import { Heading } from '@/components/heading';
-import { CardList } from './_components/card-list';
 import { SentList } from './_components/sent-list';
 
 import { prismadb } from '@/lib/database';
 import { getCurrentUser } from '@/lib/get-current-user';
+import { CardItem } from './_components/card-item';
+import { Inbox, Send } from 'lucide-react';
+import { getInboxes, getMailsSent } from '@/lib/get-overview';
 
 export default async function Home() {
   const currentUser = await getCurrentUser();
+
   const sents = await prismadb.mail.findMany({
     where: {
       senderId: currentUser?.id,
@@ -14,6 +17,10 @@ export default async function Home() {
     include: {
       recipient: true,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: 5,
   });
 
   const users = await prismadb.user.findMany({
@@ -26,6 +33,9 @@ export default async function Home() {
     },
   });
 
+  const totalInbox = await getInboxes();
+  const totalSents = await getMailsSent();
+
   return (
     <main className="p-6 space-y-8">
       <Heading
@@ -33,7 +43,10 @@ export default async function Home() {
         description="All the activity will shown here."
       />
 
-      <CardList />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <CardItem icon={Inbox} title="Total Inbox" total={totalInbox} />
+        <CardItem icon={Send} title="Mails Sent" total={totalSents} />
+      </div>
       <SentList data={sents} users={users} />
     </main>
   );

@@ -1,6 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
-import { CardListSkeleton } from './_components/card-list';
 import { SentListSkeleton } from './_components/sent-list';
+import { CardItemSkeleton } from './_components/card-item';
 
 const RootLoading = () => {
   return (
@@ -9,7 +9,11 @@ const RootLoading = () => {
         <Skeleton className="w-20 h-8 rounded-md" />
         <Skeleton className="w-36 h-4 rounded-md" />
       </div>
-      <CardListSkeleton />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[...Array(3)].map((_, i) => (
+          <CardItemSkeleton key={i} />
+        ))}
+      </div>
       <SentListSkeleton />
     </div>
   );

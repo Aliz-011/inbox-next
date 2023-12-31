@@ -11,7 +11,7 @@ export const createMail = async (values: Partial<Mail>) => {
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
-    return redirect('/');
+    return redirect('/sign-in');
   }
 
   const validData = {
@@ -39,7 +39,7 @@ export const updateMail = async (mailId: string, values: Partial<Mail>) => {
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
-    return redirect('/');
+    return redirect('/sign-in');
   }
 
   if (!mailId) {
@@ -69,4 +69,30 @@ export const updateMail = async (mailId: string, values: Partial<Mail>) => {
   revalidatePath(`/mails/${mailId}`);
 
   return JSON.parse(JSON.stringify({ data: updatedMail, status: 200 }));
+};
+
+export const markAsRead = async (mailId: string) => {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return redirect('/sign-in');
+  }
+
+  const updateReadMessage = await prismadb.mail.update({
+    where: {
+      id: mailId,
+      AND: [
+        {
+          recipientId: currentUser.id,
+        },
+      ],
+    },
+    data: {
+      isRead: true,
+    },
+  });
+
+  revalidatePath('/inbox');
+
+  return JSON.parse(JSON.stringify({ data: updateReadMessage, status: 200 }));
 };

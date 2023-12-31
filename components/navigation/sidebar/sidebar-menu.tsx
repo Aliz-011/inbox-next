@@ -20,7 +20,7 @@ export const SidebarMenu = ({
 }: {
   routes: {
     title: string;
-    label: string;
+    label: string | number;
     href: string;
     icon: LucideIcon;
   }[];
@@ -41,7 +41,7 @@ export const SidebarMenu = ({
                 <Link
                   href={route.href}
                   className={cn(
-                    buttonVariants({ variant: variant, size: 'icon' }),
+                    buttonVariants({ variant, size: 'icon' }),
                     variant === 'default' &&
                       'dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white',
                     'h-9 w-9 ml-1'
@@ -65,7 +65,7 @@ export const SidebarMenu = ({
               title={route.title}
               icon={route.icon}
               label={route.label}
-              isActive={pathname === route.href}
+              isActive={isActive}
             />
           );
         })}

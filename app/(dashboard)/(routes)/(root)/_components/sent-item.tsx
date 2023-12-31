@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Mail, User } from '@prisma/client';
+import { formatDistanceToNow } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +14,6 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { timeAgo } from '@/lib/utils';
 
 export const SentItem = ({ mail }: { mail: Mail & { recipient: User } }) => {
   const router = useRouter();
@@ -30,7 +30,10 @@ export const SentItem = ({ mail }: { mail: Mail & { recipient: User } }) => {
           </CardDescription>
         </div>
         <span className="text-xs font-light p-0">
-          {timeAgo(mail.createdAt)}
+          {formatDistanceToNow(new Date(mail.createdAt), {
+            includeSeconds: true,
+            addSuffix: true,
+          })}
         </span>
       </CardHeader>
       <CardContent className="space-y-2">

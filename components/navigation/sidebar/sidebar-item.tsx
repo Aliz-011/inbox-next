@@ -16,7 +16,7 @@ export const SidebarItem = ({
   isActive,
 }: {
   title: string;
-  label?: string;
+  label?: string | number;
   href: string;
   isActive: boolean;
   icon: LucideIcon;
@@ -27,7 +27,7 @@ export const SidebarItem = ({
     <Link
       href={href}
       className={cn(
-        buttonVariants({ variant: variant, size: 'sm' }),
+        buttonVariants({ variant, size: 'sm' }),
         variant === 'default' &&
           'dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white',
         'justify-start'

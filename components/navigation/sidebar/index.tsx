@@ -70,28 +70,33 @@ const mainRoutes = [
 
 const secondaryRoutes = [
   {
-    label: 'Social',
+    title: 'Social',
+    label: '',
     href: '/social',
     icon: Users2,
   },
   {
-    label: 'Updates',
+    title: 'Updates',
+    label: '',
     href: '/updates',
     icon: AlertCircle,
   },
   {
-    label: 'Forums',
+    title: 'Forums',
+    label: '',
     href: '/forums',
     icon: MessagesSquare,
   },
   {
-    label: 'Shopping',
+    title: 'Shopping',
+    label: '',
     href: '/shopping',
     icon: ShoppingCart,
   },
   {
-    label: 'Setting',
-    href: '/settings/profile',
+    title: 'Setting',
+    label: '',
+    href: '/settings',
     icon: Settings,
   },
 ];
@@ -117,9 +122,9 @@ export const Sidebar = () => {
           <SidebarMenu routes={mainRoutes} />
         </div>
 
-        {/* <div className="space-y-4">
+        <div className="space-y-4">
           <SidebarMenu routes={secondaryRoutes} />
-        </div> */}
+        </div>
       </aside>
     </TooltipProvider>
   );

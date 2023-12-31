@@ -1,20 +1,21 @@
 'use client';
 
-import { Bell } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Fragment, useTransition } from 'react';
+import { Bell } from 'lucide-react';
 import { Mail, User } from '@prisma/client';
+import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-import { timeAgo } from '@/lib/utils';
-import { Fragment } from 'react';
 
 export const Notification = ({
   notifications,
@@ -22,6 +23,7 @@ export const Notification = ({
   notifications: (Mail & { sender: User })[];
 }) => {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   return (
     <DropdownMenu>
@@ -34,18 +36,37 @@ export const Notification = ({
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium leading-none">
+              {notifications.length > 0
+                ? `New messages (${notifications.length})`
+                : 'Messages'}
+            </p>
+            <button className="text-xs leading-none text-muted-foreground">
+              Clear all
+            </button>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
         {notifications.length > 0 ? (
           <DropdownMenuGroup>
             {notifications?.map((notification) => (
               <Fragment key={notification.id}>
-                <DropdownMenuItem className="w-full">
+                <DropdownMenuItem
+                  className="w-full cursor-pointer"
+                  onClick={() => router.push(`/inbox/${notification.id}`)}
+                >
                   <div className="w-full">
                     <div className="flex items-center justify-between w-full">
                       <div className="font-semibold text-xs truncate">
                         {notification.sender.name}
                       </div>
                       <span className="text-xs">
-                        {timeAgo(notification.createdAt)}
+                        {formatDistanceToNow(new Date(notification.createdAt), {
+                          includeSeconds: true,
+                          addSuffix: true,
+                        })}
                       </span>
                     </div>
                     <div className="w-full">

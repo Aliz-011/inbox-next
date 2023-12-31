@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 const sidebarNavItems = [
   {
     title: 'Profile',
-    href: '/settings/profile',
+    href: '/settings',
   },
   {
     title: 'Password',
