@@ -64,7 +64,6 @@ export const Notification = ({
                       </div>
                       <span className="text-xs">
                         {formatDistanceToNow(new Date(notification.createdAt), {
-                          includeSeconds: true,
                           addSuffix: true,
                         })}
                       </span>

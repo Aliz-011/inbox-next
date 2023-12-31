@@ -45,17 +45,14 @@ export const InboxClient = ({
   const onClickMarkAsRead = (id: string) => {
     try {
       startTransition(() => {
-        markAsRead(id)
-          .then((data) => {
-            if (data.status !== 200) {
-              return;
-            }
-            toast.success('Message is readed');
-            router.refresh();
-          })
-          .catch((err: any) => {
-            throw new Error(err.message);
-          });
+        markAsRead(id).then((data) => {
+          if (data.status !== 200) {
+            toast.error(data.message);
+            return;
+          }
+          toast.success('Message is readed');
+          router.refresh();
+        });
       });
     } catch (error) {
       console.log(error);
@@ -164,6 +161,7 @@ export const InboxClient = ({
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
                   className="cursor-pointer"
+                  disabled={data?.isRead}
                   onClick={() => onClickMarkAsRead(data?.id!)}
                 >
                   Mark as unread

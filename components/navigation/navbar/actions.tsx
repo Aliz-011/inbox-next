@@ -61,7 +61,7 @@ export const Actions = ({
           <DropdownMenuGroup>
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => router.push('/settings/profile')}
+              onClick={() => router.push('/settings')}
             >
               Profile
             </DropdownMenuItem>

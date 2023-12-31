@@ -76,7 +76,7 @@ export const SentClient = ({
         </ScrollArea>
       </ResizablePanel>
       <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={25} minSize={30} className="py-6">
+      <ResizablePanel defaultSize={25} minSize={30} className="pb-6">
         {data && (
           <div className="flex flex-1 flex-col">
             <div className="flex items-start p-4">
@@ -91,10 +91,10 @@ export const SentClient = ({
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid gap-1">
-                  <div className="font-semibold">{currentUser?.email}</div>
+                  <div className="font-semibold">{currentUser?.name}</div>
                   <div className="line-clamp-1 text-xs">{data.title}</div>
                   <div className="line-clamp-1 text-xs">
-                    <span className="font-medium">Mail-To:</span>{' '}
+                    <span className="font-medium">Sent-To:</span>{' '}
                     {data?.recipient.name}
                   </div>
                 </div>

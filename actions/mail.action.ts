@@ -78,6 +78,23 @@ export const markAsRead = async (mailId: string) => {
     return redirect('/sign-in');
   }
 
+  const mailAlreadyReaded = await prismadb.mail.findFirst({
+    where: {
+      id: mailId,
+      AND: [
+        {
+          isRead: true,
+        },
+      ],
+    },
+  });
+
+  if (mailAlreadyReaded) {
+    return JSON.parse(
+      JSON.stringify({ message: 'Message already readed', status: 400 })
+    );
+  }
+
   const updateReadMessage = await prismadb.mail.update({
     where: {
       id: mailId,

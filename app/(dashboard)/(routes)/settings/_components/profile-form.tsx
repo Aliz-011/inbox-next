@@ -141,7 +141,7 @@ export const ProfileForm = ({ currentUser }: { currentUser: User | null }) => {
             control={form.control}
             name="dob"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="flex flex-col mt-0 md:mt-2">
                 <FormLabel>Date of birth</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
