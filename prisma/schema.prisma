@@ -21,8 +21,8 @@ model User {
   phone String?
   address String? @db.Text
 
-  sentMails Mail[] @relation(name: "Sender")
-  receivedMails Mail[] @relation(name: "Recipient")
+  sentMails Mail[] @relation("Sender")
+  receivedMails Mail[] @relation("Recipient")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -32,12 +32,13 @@ model Mail {
   id String @id @default(uuid())
   title String
   content String? @db.Text
-  mailCode String @db.Text
+  mailCode String? @db.Text
   isRead Boolean @default(false)
   isDrafted Boolean @default(false)
 
   senderId String
-  sender User @relation(name: "Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  sender User @relation(name: "Sender", fields: [senderId], references: [id])
+
   recipientId String
   recipient User @relation(name: "Recipient", fields: [recipientId], references: [id])
 
@@ -48,5 +49,4 @@ model Mail {
 
   @@index([senderId])
   @@index([recipientId])
-  @@index([senderId, recipientId])
 }

@@ -29,19 +29,19 @@ export const SentItem = ({ mail }: { mail: Mail & { recipient: User } }) => {
             {mail.title}
           </CardDescription>
         </div>
-        <span className="text-xs font-light">{timeAgo(mail.createdAt)}</span>
+        <span className="text-xs font-light p-0">
+          {timeAgo(mail.createdAt)}
+        </span>
       </CardHeader>
-      <CardContent className="space-y-1">
+      <CardContent className="space-y-2">
         <p className="text-xs text-muted-foreground truncate">{mail.content}</p>
-      </CardContent>
-      <CardFooter>
         <Button
           className="w-full"
           onClick={() => router.push(`/mails/${mail.id}`)}
         >
           View details
         </Button>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 };

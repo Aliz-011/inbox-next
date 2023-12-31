@@ -13,11 +13,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-import { Mail, User } from '@prisma/client';
 import { Search } from './search';
 import { Notification } from './notification';
 import { Button } from '@/components/ui/button';
+
+import { Mail, User } from '@prisma/client';
 
 export const Actions = ({
   currentUser,

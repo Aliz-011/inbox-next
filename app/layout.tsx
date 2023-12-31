@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
+import { EdgeStoreProvider } from '@/lib/edgestore';
 import { Toaster } from '@/components/ui/sonner';
 import { ModalProvider } from '@/components/providers/modal-provider';
 
@@ -22,7 +23,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <Toaster position="top-center" />
         <ModalProvider />
-        {children}
+        <EdgeStoreProvider>{children}</EdgeStoreProvider>
       </body>
     </html>
   );

@@ -10,22 +10,10 @@ export const Navbar = async () => {
   const currentUser = await getCurrentUser();
   const notifications = await prismadb.mail.findMany({
     where: {
-      NOT: [
-        {
-          senderId: currentUser?.id,
-        },
-      ],
-      AND: [
-        {
-          isRead: false,
-        },
-      ],
+      recipientId: currentUser?.id,
     },
     include: {
       sender: true,
-    },
-    orderBy: {
-      createdAt: 'asc',
     },
   });
 

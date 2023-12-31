@@ -12,9 +12,9 @@ import {
   Loader2,
   PenSquare,
 } from 'lucide-react';
+import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
 import { Mail, User } from '@prisma/client';
 import { toast } from 'sonner';
-import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
 
 import {
   DropdownMenu,
@@ -43,6 +43,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -55,9 +56,7 @@ const formSchema = z.object({
   title: z.string().min(5),
   content: z.string().optional(),
   mailCode: z.string(),
-  recipientId: z.string({
-    required_error: 'Please select a user to send for.',
-  }),
+  recipientId: z.string(),
 });
 
 type MailFormValues = z.infer<typeof formSchema>;
@@ -73,13 +72,13 @@ export const MailForm = ({
   const params = useParams();
   const [isPending, startTransition] = useTransition();
 
-  const action = initialData ? 'Save changes' : 'Create';
-  const toastMessage = initialData ? 'Mail updated' : 'Mail created';
-
   const usersCombobox = users.map((user) => ({
     label: user.name,
     value: user.id,
   }));
+
+  const action = initialData ? 'Save changes' : 'Create';
+  const toastMessage = initialData ? 'Mail updated' : 'Mail created';
 
   const form = useForm<MailFormValues>({
     resolver: zodResolver(formSchema),
@@ -242,7 +241,6 @@ export const MailForm = ({
             name="recipientId"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Mail to</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>

@@ -20,8 +20,8 @@ export const createMail = async (values: Partial<Mail>) => {
     mailCode: values.mailCode!,
     isDrafted: values.isDrafted!,
     senderId: currentUser.id,
-    recipientId: values.recipientId!,
     attachment: values.attachment!,
+    recipientId: values.recipientId!,
   };
 
   const newMail = await prismadb.mail.create({
@@ -30,7 +30,7 @@ export const createMail = async (values: Partial<Mail>) => {
     },
   });
 
-  revalidatePath('/mail/new');
+  revalidatePath('/mails/new');
 
   return JSON.parse(JSON.stringify({ data: newMail, status: 201 }));
 };
@@ -54,7 +54,6 @@ export const updateMail = async (mailId: string, values: Partial<Mail>) => {
     mailCode: values.mailCode,
     isDrafted: values.isDrafted,
     senderId: currentUser.id,
-    recipientId: values.recipientId,
     attachment: values.attachment,
   };
 
@@ -67,9 +66,7 @@ export const updateMail = async (mailId: string, values: Partial<Mail>) => {
     },
   });
 
-  console.log(updatedMail);
-
-  revalidatePath(`/mail/${mailId}`);
+  revalidatePath(`/mails/${mailId}`);
 
   return JSON.parse(JSON.stringify({ data: updatedMail, status: 200 }));
 };

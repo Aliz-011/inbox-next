@@ -7,15 +7,22 @@ import { getCurrentUser } from '@/lib/get-current-user';
 
 export default async function Home() {
   const currentUser = await getCurrentUser();
-  const mails = await prismadb.mail.findMany({
+  const sents = await prismadb.mail.findMany({
     where: {
       senderId: currentUser?.id,
     },
     include: {
       recipient: true,
     },
-    orderBy: {
-      createdAt: 'desc',
+  });
+
+  const users = await prismadb.user.findMany({
+    where: {
+      NOT: [
+        {
+          id: currentUser?.id,
+        },
+      ],
     },
   });
 
@@ -27,7 +34,7 @@ export default async function Home() {
       />
 
       <CardList />
-      <SentList mails={mails} />
+      <SentList data={sents} users={users} />
     </main>
   );
 }
