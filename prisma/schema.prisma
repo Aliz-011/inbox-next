@@ -35,6 +35,8 @@ model Mail {
   mailCode String? @db.Text @unique
   isRead Boolean @default(false)
   isDrafted Boolean @default(false)
+  isDeleted Boolean @default(false)
+  isArchived Boolean @default(false)
 
   senderId String
   sender User @relation(name: "Sender", fields: [senderId], references: [id])
@@ -44,9 +46,21 @@ model Mail {
 
   attachment String? @db.Text
 
+  labels Label[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([senderId])
   @@index([recipientId])
+}
+
+model Label {
+  id String @id @default(uuid())
+  name String @unique
+
+  mails Mail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

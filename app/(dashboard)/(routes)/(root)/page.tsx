@@ -13,6 +13,11 @@ export default async function Home() {
   const sents = await prismadb.mail.findMany({
     where: {
       senderId: currentUser?.id,
+      AND: [
+        {
+          isDeleted: false,
+        },
+      ],
     },
     include: {
       recipient: true,

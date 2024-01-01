@@ -23,7 +23,9 @@ import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().min(1, {
+    message: 'Password is required',
+  }),
 });
 
 const SignInPage = () => {

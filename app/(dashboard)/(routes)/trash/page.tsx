@@ -1,34 +1,35 @@
 import { prismadb } from '@/lib/database';
-import { Container } from './_components/container';
 import { getCurrentUser } from '@/lib/get-current-user';
-import { SentClient } from './_components/client';
 
-const SentPage = async () => {
+import { Container } from './_components/container';
+import { TrashClient } from './_components/client';
+
+const TrashPage = async () => {
   const currentUser = await getCurrentUser();
 
-  const mailsSent = await prismadb.mail.findMany({
+  const trashMails = await prismadb.mail.findMany({
     where: {
       senderId: currentUser?.id,
       AND: [
         {
-          isDeleted: false,
+          isDeleted: true,
         },
       ],
     },
     include: {
-      recipient: true,
       labels: true,
+      recipient: true,
     },
     orderBy: {
-      createdAt: 'desc',
+      updatedAt: 'desc',
     },
   });
 
   return (
     <Container>
-      <SentClient currentUser={currentUser} mails={mailsSent} />
+      <TrashClient mails={trashMails} currentUser={currentUser} />
     </Container>
   );
 };
 
-export default SentPage;
+export default TrashPage;

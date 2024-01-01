@@ -21,9 +21,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Toaster position="top-center" />
-        <ModalProvider />
-        <EdgeStoreProvider>{children}</EdgeStoreProvider>
+        <EdgeStoreProvider>
+          <ModalProvider />
+          <Toaster position="top-center" />
+          {children}
+        </EdgeStoreProvider>
       </body>
     </html>
   );

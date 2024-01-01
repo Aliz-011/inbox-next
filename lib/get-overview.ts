@@ -12,6 +12,11 @@ export const getInboxes = async () => {
   const inboxes = await prismadb.mail.count({
     where: {
       recipientId: currentUser.id,
+      AND: [
+        {
+          isDeleted: false,
+        },
+      ],
     },
   });
 
@@ -28,6 +33,11 @@ export const getMailsSent = async () => {
   const sents = await prismadb.mail.count({
     where: {
       senderId: currentUser?.id,
+      AND: [
+        {
+          isDeleted: false,
+        },
+      ],
     },
   });
 

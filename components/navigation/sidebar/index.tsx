@@ -3,7 +3,6 @@
 import {
   AlertCircle,
   Archive,
-  ArchiveX,
   File,
   Inbox,
   LayoutGrid,
@@ -47,12 +46,6 @@ const mainRoutes = [
     label: '',
     href: '/sent',
     icon: Send,
-  },
-  {
-    title: 'Junk',
-    label: '',
-    href: '/junk',
-    icon: ArchiveX,
   },
   {
     title: 'Trash',

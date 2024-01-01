@@ -4,7 +4,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { formatDistanceToNow, format } from 'date-fns';
 import { Forward, MoreVertical, Reply, ReplyAll } from 'lucide-react';
 import { toast } from 'sonner';
-import { useTransition } from 'react';
+import Image from 'next/image';
+import { ComponentProps, useTransition } from 'react';
 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -17,24 +18,26 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-
-import { useInbox } from '@/hooks/use-inbox';
-import { cn } from '@/lib/utils';
-import { Mail, User } from '@prisma/client';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+
+import { cn } from '@/lib/utils';
+import { Label, Mail, User } from '@prisma/client';
 import { markAsRead } from '@/actions/mail.action';
+import { useInbox } from '@/hooks/use-inbox';
+import Link from 'next/link';
 
 export const InboxClient = ({
   inboxes,
   currentUser,
 }: {
-  inboxes: (Mail & { sender: User })[];
+  inboxes: (Mail & { sender: User; labels: Label[] })[];
   currentUser: User | null;
 }) => {
   const pathname = usePathname();
@@ -67,51 +70,69 @@ export const InboxClient = ({
           title="Inbox"
           description="All the mails from someone you may know."
         />
-        <ScrollArea className="h-[80vh]">
-          <div className="flex flex-col gap-2">
-            {inboxes.map((inbox) => (
-              <button
-                key={inbox.id}
-                className={cn(
-                  'flex flex-col w-full items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent',
-                  data?.id === inbox.id && 'bg-muted'
-                )}
-                onClick={() => {
-                  onSelect(inbox);
-                }}
-              >
-                <div className="flex w-full flex-col gap-1">
-                  <div className="flex items-center">
-                    <div className="flex items-center gap-2">
-                      <div className="font-semibold">{inbox.sender.name}</div>
-                      {!inbox.isRead && (
-                        <span className="flex h-2 w-2 rounded-full bg-blue-600" />
-                      )}
+        {inboxes.length > 0 ? (
+          <ScrollArea className="h-[80vh]">
+            <div className="flex flex-col gap-2">
+              {inboxes.map((inbox) => (
+                <button
+                  key={inbox.id}
+                  className={cn(
+                    'flex flex-col w-full items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent',
+                    data?.id === inbox.id && 'bg-muted'
+                  )}
+                  onClick={() => {
+                    onSelect(inbox);
+                  }}
+                >
+                  <div className="flex w-full flex-col gap-1">
+                    <div className="flex items-center">
+                      <div className="flex items-center gap-2">
+                        <div className="font-semibold">{inbox.sender.name}</div>
+                        {!inbox.isRead && (
+                          <span className="flex h-2 w-2 rounded-full bg-blue-600" />
+                        )}
+                      </div>
+                      <div
+                        className={cn(
+                          'ml-auto text-xs',
+                          data?.id === inbox.id
+                            ? 'text-foreground'
+                            : 'text-muted-foreground'
+                        )}
+                      >
+                        {formatDistanceToNow(new Date(inbox.createdAt), {
+                          addSuffix: true,
+                          includeSeconds: true,
+                        })}
+                      </div>
                     </div>
-                    <div
-                      className={cn(
-                        'ml-auto text-xs',
-                        data?.id === inbox.id
-                          ? 'text-foreground'
-                          : 'text-muted-foreground'
-                      )}
-                    >
-                      {formatDistanceToNow(new Date(inbox.createdAt), {
-                        addSuffix: true,
-                        includeSeconds: true,
-                      })}
-                    </div>
+                    <div className="text-xs font-medium">{inbox.title}</div>
                   </div>
-                  <div className="text-xs font-medium">{inbox.title}</div>
-                </div>
 
-                <div className="line-clamp-2 text-xs text-muted-foreground">
-                  {inbox.content}
-                </div>
-              </button>
-            ))}
+                  <div className="line-clamp-2 text-xs text-muted-foreground">
+                    {inbox.content}
+                  </div>
+                  {inbox.labels.length > 0 ? (
+                    <div className="flex items-center gap-2">
+                      {inbox.labels.map((item) => (
+                        <Badge
+                          key={item.id}
+                          variant={getBadgeVariantFromLabel(item.name)}
+                        >
+                          {item.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+          </ScrollArea>
+        ) : (
+          <div className="relative w-full flex items-center justify-center h-full">
+            <Image src="/null.svg" alt="empty" height={500} width={250} />
           </div>
-        </ScrollArea>
+        )}
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={25} minSize={30} className="pb-6">
@@ -204,8 +225,29 @@ export const InboxClient = ({
               </div>
 
               <Separator />
+
               <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
                 {data.content}
+              </div>
+              <div className="w-full p-4 h-full">
+                {data?.attachment && (
+                  <>
+                    <Link
+                      href={data.attachment}
+                      target="_blank"
+                      className="text-blue-500 hover:underline hover:text-gray-900 transition text-sm"
+                    >
+                      Attachment
+                    </Link>
+                    <Image
+                      src={data.attachment}
+                      alt={data.title}
+                      width={400}
+                      height={400}
+                      className="aspect-video object-cover"
+                    />
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -214,3 +256,17 @@ export const InboxClient = ({
     </>
   );
 };
+
+function getBadgeVariantFromLabel(
+  label: string
+): ComponentProps<typeof Badge>['variant'] {
+  if (['work'].includes(label.toLowerCase())) {
+    return 'default';
+  }
+
+  if (['personal', 'chill'].includes(label.toLowerCase())) {
+    return 'outline';
+  }
+
+  return 'secondary';
+}

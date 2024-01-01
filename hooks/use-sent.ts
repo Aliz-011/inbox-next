@@ -12,7 +12,7 @@ interface SentStore {
   onUnSelect: () => void;
 }
 
-export const useInbox = create<SentStore>((set) => ({
+export const useSent = create<SentStore>((set) => ({
   isSelected: false,
   data: undefined,
   onSelect: (data: MailWithUser) => set({ data, isSelected: true }),

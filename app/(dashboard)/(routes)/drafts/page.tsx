@@ -1,6 +1,14 @@
+import { Metadata } from 'next';
+
 import { Heading } from '@/components/heading';
+
 import { prismadb } from '@/lib/database';
 import { getCurrentUser } from '@/lib/get-current-user';
+
+export const metadata: Metadata = {
+  title: 'Drafts',
+  description: 'Drafts page',
+};
 
 const DraftsPage = async () => {
   const currentUser = await getCurrentUser();

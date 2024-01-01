@@ -5,16 +5,12 @@ import { useParams, useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import {
-  ChevronDown,
-  FileType2,
-  Link2,
-  Loader2,
-  PenSquare,
-} from 'lucide-react';
-import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
+import { ChevronDown, FileType2, Link2, Loader2 } from 'lucide-react';
+import { CaretSortIcon, CheckIcon, TrashIcon } from '@radix-ui/react-icons';
 import { Mail, User } from '@prisma/client';
 import { toast } from 'sonner';
+import Select, { MultiValue, ActionMeta } from 'react-select';
+import { useIsClient } from 'usehooks-ts';
 
 import {
   DropdownMenu,
@@ -49,11 +45,12 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Editor } from '@/components/editor';
 
-import { createMail, updateMail } from '@/actions/mail.action';
+import { createMail, softDelete, updateMail } from '@/actions/mail.action';
 import { cn } from '@/lib/utils';
 import { useEdgeStore } from '@/lib/edgestore';
 import { SingleImageDropzone } from '@/components/image-uploader/single-image-dropzone';
 import { Label } from '@/components/ui/label';
+import { AlertModal } from '@/components/modals/alert-modal';
 
 const formSchema = z.object({
   title: z.string().min(5),
@@ -64,19 +61,27 @@ const formSchema = z.object({
 
 type MailFormValues = z.infer<typeof formSchema>;
 
+interface Option {
+  label: string;
+  value: string;
+}
+
 export const MailForm = ({
   initialData,
   users,
+  categories,
 }: {
   initialData: Mail | null;
   users: User[];
+  categories: Option[];
 }) => {
   const router = useRouter();
   const params = useParams();
   const [file, setFile] = useState<File>();
-  const [url, setUrl] = useState('');
+  const [selectedLabels, setSelectedLabels] = useState<Option[]>([]);
   const { edgestore } = useEdgeStore();
   const [isPending, startTransition] = useTransition();
+  const isClient = useIsClient();
 
   const usersCombobox = users.map((user) => ({
     label: user.name,
@@ -104,26 +109,34 @@ export const MailForm = ({
   async function onSubmit(values: MailFormValues) {
     try {
       if (!initialData) {
+        const res = await edgestore.publicImages.upload({ file: file! });
+
         startTransition(() => {
-          createMail({ ...values }).then((data) => {
-            if (!data) {
-              throw new Error('Something went error');
+          createMail({ ...values, attachment: res.url }, selectedLabels).then(
+            (data) => {
+              if (!data) {
+                toast.error('Something went error');
+                return;
+              }
+              toast.success(toastMessage);
+              router.refresh();
+              router.push('/');
             }
-            toast.success(toastMessage);
-            router.refresh();
-            router.push('/');
-          });
+          );
         });
       } else {
         startTransition(() => {
-          updateMail(params.mailId as string, { ...values }).then((data) => {
-            if (!data) {
-              throw new Error('Something went error');
+          updateMail(`${params.mailId}`, { ...values }, selectedLabels).then(
+            (data) => {
+              if (!data) {
+                toast.error('Something went error');
+                return;
+              }
+              toast.success(toastMessage);
+              router.refresh();
+              router.push('/');
             }
-            toast.success(toastMessage);
-            router.refresh();
-            router.push('/');
-          });
+          );
         });
       }
     } catch (error: any) {
@@ -132,12 +145,28 @@ export const MailForm = ({
     }
   }
 
-  const onChange = async (file?: File) => {
-    if (file) {
-      const res = await edgestore.publicFiles.upload({ file });
-      setUrl(res.url);
+  const handleDelete = () => {
+    try {
+      startTransition(() => {
+        softDelete(params.mailId as string).then((data) => {
+          if (data.status !== 200) {
+            toast.error('Something went error');
+            return;
+          }
+          toast.success('Mail Deleted');
+          router.refresh();
+          router.push('/');
+        });
+      });
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.message);
     }
   };
+
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <>
@@ -155,15 +184,17 @@ export const MailForm = ({
         </div>
         <div className="mt-5 flex lg:ml-4 lg:mt-0 items-center">
           {initialData && (
-            <span className="hidden sm:block">
-              <Button type="button" variant="outline">
-                <PenSquare
-                  className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-                Edit
-              </Button>
-            </span>
+            <AlertModal onConfirm={handleDelete} loading={isPending}>
+              <span className="hidden sm:block">
+                <Button type="button" variant="destructive">
+                  <TrashIcon
+                    className="-ml-0.5 mr-1.5 h-5 w-5"
+                    aria-hidden="true"
+                  />
+                  Delete
+                </Button>
+              </span>
+            </AlertModal>
           )}
 
           <span className="ml-3 hidden sm:block">
@@ -212,30 +243,50 @@ export const MailForm = ({
               </FormItem>
             )}
           />
-          <div className="flex flex-col md:flex-row items-center justify-between gap-x-4">
-            <FormField
-              control={form.control}
-              name="mailCode"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Mail Code</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g. SK0-xxx"
-                      className="w-full"
-                      disabled={isPending}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="mailCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mail Code</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. SK0-xxx"
+                    disabled={isPending}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex flex-col md:flex-row md:items-center mdjustify-between gap-4">
+            <div className="w-full md:w-2/3">
+              <Label>Labels</Label>
+              <Select
+                isMulti
+                isSearchable
+                name="labels"
+                options={categories}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                onChange={(selected, actionMeta) => {
+                  const selectedValues = selected.map(
+                    (item) =>
+                      ({
+                        value: item.value,
+                        label: item.label,
+                      } as Option)
+                  );
+                  setSelectedLabels(selectedValues);
+                }}
+              />
+            </div>
             <FormField
               control={form.control}
               name="recipientId"
               render={({ field }) => (
-                <FormItem className="flex flex-col mt-0 md:mt-2">
+                <FormItem className="flex flex-col mt-0 md:mt-2 w-full md:w-1/3">
                   <FormLabel>Mail to</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -244,7 +295,7 @@ export const MailForm = ({
                           variant="outline"
                           role="combobox"
                           className={cn(
-                            'w-[200px] justify-between',
+                            'w-full justify-between',
                             !field.value && 'text-muted-foreground'
                           )}
                         >
@@ -257,7 +308,7 @@ export const MailForm = ({
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
+                    <PopoverContent className="w-full p-0">
                       <Command>
                         <CommandInput
                           placeholder="Search user..."
