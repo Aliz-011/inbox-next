@@ -1,8 +1,15 @@
+import { Metadata } from 'next';
+
 import { prismadb } from '@/lib/database';
 import { getCurrentUser } from '@/lib/get-current-user';
 
 import { Container } from './_components/container';
 import { TrashClient } from './_components/client';
+
+export const metadata: Metadata = {
+  title: 'Trash',
+  description: 'Trash management',
+};
 
 const TrashPage = async () => {
   const currentUser = await getCurrentUser();

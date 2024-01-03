@@ -2,26 +2,31 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider          = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  directUrl         = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
 }
 
 model User {
-  id String @id @default(uuid())
-  name String @db.Text
-  email String @unique
-  password String @db.Text
+  id          String    @id @default(uuid())
+  name        String    @db.Text
+  email       String    @unique
+  password    String    @db.Text
   dateOfBirth DateTime?
-  photoUrl String? @db.Text
-  phone String?
-  address String? @db.Text
+  photoUrl    String?   @db.Text
+  phone       String?
+  address     String?   @db.Text
 
-  sentMails Mail[] @relation("Sender")
+  sentMails     Mail[] @relation("Sender")
   receivedMails Mail[] @relation("Recipient")
 
   createdAt DateTime @default(now())
@@ -29,24 +34,23 @@ model User {
 }
 
 model Mail {
-  id String @id @default(uuid())
-  title String
-  content String? @db.Text
-  mailCode String? @db.Text @unique
-  isRead Boolean @default(false)
-  isDrafted Boolean @default(false)
-  isDeleted Boolean @default(false)
+  id         String  @id @default(uuid())
+  title      String
+  content    String? @db.Text
+  mailCode   String? @unique @db.Text
+  isRead     Boolean @default(false)
+  isDrafted  Boolean @default(false)
+  isDeleted  Boolean @default(false)
   isArchived Boolean @default(false)
-
-  senderId String
-  sender User @relation(name: "Sender", fields: [senderId], references: [id])
-
-  recipientId String
-  recipient User @relation(name: "Recipient", fields: [recipientId], references: [id])
-
   attachment String? @db.Text
 
-  labels Label[]
+  senderId    String
+  sender      User   @relation(name: "Sender", fields: [senderId], references: [id])
+  recipientId String
+  recipient   User   @relation(name: "Recipient", fields: [recipientId], references: [id])
+
+  labels    Label[]
+  timelines MailTimeline[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -55,8 +59,27 @@ model Mail {
   @@index([recipientId])
 }
 
+model Timeline {
+  id     String         @id @default(uuid())
+  status String?
+  mails  MailTimeline[]
+}
+
+model MailTimeline {
+  mailId     String
+  mail       Mail     @relation(fields: [mailId], references: [id])
+  timelineId String
+  timeline   Timeline @relation(fields: [timelineId], references: [id])
+
+  assignedBy String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@id([mailId, timelineId])
+}
+
 model Label {
-  id String @id @default(uuid())
+  id   String @id @default(uuid())
   name String @unique
 
   mails Mail[]

@@ -18,21 +18,3 @@ export const useInbox = create<InboxStore>((set) => ({
   onSelect: (data: MailWithUser) => set({ data, isSelected: true }),
   onUnSelect: () => set({ isSelected: false }),
 }));
-
-// interface MailStore<T extends keyof { sender: User; recipient: User }> {
-//   isSelected: boolean;
-//   data?: T extends 'sender' ? Mail & { sender: User } : Mail & { recipient: User };
-//   onSelect: (data: T extends 'sender' ? Mail & { sender: User } : Mail & { recipient: User }) => void;
-//   onUnSelect: () => void;
-// }
-
-// export const useMail = <T extends keyof { sender: User; recipient: User }>(
-//   type: T
-// ) =>
-//   create<MailStore<T>>((set) => ({
-//     isSelected: false,
-//     data: undefined,
-//     onSelect: (data: T extends 'sender' ? Mail & { sender: User } : Mail & { recipient: User }) =>
-//       set({ data, isSelected: true }),
-//     onUnSelect: () => set({ isSelected: false }),
-//   }));

@@ -9,7 +9,7 @@ import { ChevronDown, FileType2, Link2, Loader2 } from 'lucide-react';
 import { CaretSortIcon, CheckIcon, TrashIcon } from '@radix-ui/react-icons';
 import { Mail, User } from '@prisma/client';
 import { toast } from 'sonner';
-import Select, { MultiValue, ActionMeta } from 'react-select';
+import Select from 'react-select';
 import { useIsClient } from 'usehooks-ts';
 
 import {
@@ -57,6 +57,7 @@ const formSchema = z.object({
   content: z.string().optional(),
   mailCode: z.string(),
   recipientId: z.string(),
+  status: z.string().optional(),
 });
 
 type MailFormValues = z.infer<typeof formSchema>;
@@ -78,6 +79,7 @@ export const MailForm = ({
   const router = useRouter();
   const params = useParams();
   const [file, setFile] = useState<File>();
+  const [url, setUrl] = useState('');
   const [selectedLabels, setSelectedLabels] = useState<Option[]>([]);
   const { edgestore } = useEdgeStore();
   const [isPending, startTransition] = useTransition();
@@ -108,26 +110,36 @@ export const MailForm = ({
 
   async function onSubmit(values: MailFormValues) {
     try {
-      if (!initialData) {
-        const res = await edgestore.publicImages.upload({ file: file! });
+      if (file) {
+        const res = await edgestore.publicImages.upload({ file });
+        setUrl(res.url);
+      }
 
+      const { status, ...rest } = values;
+
+      if (!initialData) {
         startTransition(() => {
-          createMail({ ...values, attachment: res.url }, selectedLabels).then(
-            (data) => {
-              if (!data) {
-                toast.error('Something went error');
-                return;
+          createMail({ ...rest, attachment: url }, selectedLabels)
+            .then((data) => {
+              if (data.status !== 201) {
+                return toast.error('Something went error');
               }
               toast.success(toastMessage);
               router.refresh();
               router.push('/');
-            }
-          );
+            })
+            .catch((e: any) => {
+              console.log(e);
+            });
         });
       } else {
         startTransition(() => {
-          updateMail(`${params.mailId}`, { ...values }, selectedLabels).then(
-            (data) => {
+          updateMail(
+            { ...values, id: `${params.mailId}` },
+            selectedLabels,
+            status
+          )
+            .then((data) => {
               if (!data) {
                 toast.error('Something went error');
                 return;
@@ -135,8 +147,10 @@ export const MailForm = ({
               toast.success(toastMessage);
               router.refresh();
               router.push('/');
-            }
-          );
+            })
+            .catch((e: any) => {
+              console.log(e);
+            });
         });
       }
     } catch (error: any) {
@@ -366,6 +380,29 @@ export const MailForm = ({
               </FormItem>
             )}
           />
+          {initialData && (
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Subject..."
+                      disabled={isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This is the status of the mail and will be shown in the
+                    mail&apos;s timeline.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
           {/* <FormField
             control={form.control}
             name="content"

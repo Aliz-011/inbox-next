@@ -134,7 +134,9 @@ export const InboxClient = ({
           </div>
         )}
       </ResizablePanel>
+
       <ResizableHandle withHandle />
+
       <ResizablePanel defaultSize={25} minSize={30} className="pb-6">
         <div className="flex h-full flex-col">
           <div className="flex items-center p-2">

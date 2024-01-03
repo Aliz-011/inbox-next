@@ -21,7 +21,7 @@ export const authOptions: AuthOptions = {
 
         const user = await prismadb.user.findUnique({
           where: {
-            email: credentials?.email,
+            email: credentials.email,
           },
         });
 
@@ -31,7 +31,7 @@ export const authOptions: AuthOptions = {
 
         // decrypt
         const originalPassword = await bcrypt.compare(
-          credentials.password,
+          credentials?.password,
           user.password
         );
 

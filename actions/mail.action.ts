@@ -12,7 +12,17 @@ interface Option {
   value: string;
 }
 
-export const createMail = async (values: Partial<Mail>, labels: Option[]) => {
+/**
+ * This function is responsible for creating a new mail.
+ * @param values
+ * @param labels
+ * @returns
+ */
+export const createMail = async (
+  values: Partial<Mail>,
+  labels: Option[],
+  timelineStatus?: string
+) => {
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
@@ -32,6 +42,18 @@ export const createMail = async (values: Partial<Mail>, labels: Option[]) => {
   const newMail = await prismadb.mail.create({
     data: {
       ...validData,
+      timelines: {
+        create: [
+          {
+            assignedBy: currentUser.name,
+            timeline: {
+              create: {
+                status: timelineStatus ? timelineStatus : 'Mail sent',
+              },
+            },
+          },
+        ],
+      },
       labels: {
         connect: labels.map((item) => ({ id: item.value })),
       },
@@ -44,15 +66,17 @@ export const createMail = async (values: Partial<Mail>, labels: Option[]) => {
 };
 
 export const updateMail = async (
-  mailId: string,
   values: Partial<Mail>,
-  labels: Option[]
+  labels: Option[],
+  timelineStatus?: string
 ) => {
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
     return redirect('/sign-in');
   }
+
+  const mailId = values.id;
 
   if (!mailId) {
     return JSON.parse(
@@ -77,6 +101,18 @@ export const updateMail = async (
       },
       data: {
         ...validData,
+        timelines: {
+          create: [
+            {
+              assignedBy: currentUser.name,
+              timeline: {
+                create: {
+                  status: timelineStatus ? timelineStatus : null,
+                },
+              },
+            },
+          ],
+        },
         labels: { connect: labels.map((item) => ({ id: item.value })) },
       },
     });
@@ -87,6 +123,18 @@ export const updateMail = async (
       },
       data: {
         ...validData,
+        timelines: {
+          create: [
+            {
+              assignedBy: currentUser.name,
+              timeline: {
+                create: {
+                  status: timelineStatus ? timelineStatus : null,
+                },
+              },
+            },
+          ],
+        },
       },
     });
   }

@@ -41,7 +41,7 @@ export const TrashClient = ({
 }) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const { data, onSelect } = useTrashMail((state) => state);
+  const { data, onSelect, onUnSelect } = useTrashMail((state) => state);
 
   const handleDelete = (id: string) => {
     try {
@@ -53,6 +53,7 @@ export const TrashClient = ({
           }
           toast.success(data.message);
           router.refresh();
+          onUnSelect();
         });
       });
     } catch (error) {
