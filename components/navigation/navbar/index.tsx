@@ -15,6 +15,9 @@ export const Navbar = async () => {
         {
           isRead: false,
         },
+        {
+          isDeleted: false,
+        },
       ],
     },
     include: {

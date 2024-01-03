@@ -21,6 +21,7 @@ async function main() {
         name: 'meeting',
       },
     ],
+    skipDuplicates: true,
   });
   console.log({ labels });
 }

@@ -57,7 +57,6 @@ const formSchema = z.object({
   content: z.string().optional(),
   mailCode: z.string(),
   recipientId: z.string(),
-  status: z.string().optional(),
 });
 
 type MailFormValues = z.infer<typeof formSchema>;
@@ -115,11 +114,9 @@ export const MailForm = ({
         setUrl(res.url);
       }
 
-      const { status, ...rest } = values;
-
       if (!initialData) {
         startTransition(() => {
-          createMail({ ...rest, attachment: url }, selectedLabels)
+          createMail({ ...values, attachment: url }, selectedLabels)
             .then((data) => {
               if (data.status !== 201) {
                 return toast.error('Something went error');
@@ -134,11 +131,7 @@ export const MailForm = ({
         });
       } else {
         startTransition(() => {
-          updateMail(
-            { ...values, id: `${params.mailId}` },
-            selectedLabels,
-            status
-          )
+          updateMail({ ...values, id: `${params.mailId}` }, selectedLabels)
             .then((data) => {
               if (!data) {
                 toast.error('Something went error');
@@ -380,29 +373,7 @@ export const MailForm = ({
               </FormItem>
             )}
           />
-          {initialData && (
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Subject..."
-                      disabled={isPending}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    This is the status of the mail and will be shown in the
-                    mail&apos;s timeline.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
+
           {/* <FormField
             control={form.control}
             name="content"

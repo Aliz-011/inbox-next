@@ -285,7 +285,7 @@ export const SentClient = ({
                 <h4 className="text-xl text-gray-900 font-bold">Timeline</h4>
 
                 <div className="relative px-4">
-                  <div className="absolute h-full border border-dashed border-opacity-20 border-secondary" />
+                  <div className="absolute h-full border border-dashed border-opacity-70 border-secondary" />
                   {data?.timelines.map((timeline) => (
                     <div
                       className="flex items-center w-full my-6 -ml-1.5"
@@ -295,7 +295,7 @@ export const SentClient = ({
                         <div className="w-3.5 h-3.5 bg-blue-600 rounded-full" />
                       </div>
                       <div className="w-11/12">
-                        <p className="text-sm">{timeline.timeline.status}.</p>
+                        <p className="text-sm">{timeline.timeline.status}</p>
                         <p className="text-xs text-gray-500">
                           {formatDistanceToNow(new Date(timeline.createdAt), {
                             addSuffix: true,

@@ -32,6 +32,7 @@ import { Label, Mail, User } from '@prisma/client';
 import { markAsRead } from '@/actions/mail.action';
 import { useInbox } from '@/hooks/use-inbox';
 import Link from 'next/link';
+import { useForwardModal } from '@/hooks/use-forward-modal';
 
 export const InboxClient = ({
   inboxes,
@@ -44,6 +45,7 @@ export const InboxClient = ({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const { data, onSelect } = useInbox((state) => state);
+  const { onOpen } = useForwardModal((state) => state);
 
   const onClickMarkAsRead = (id: string) => {
     try {
@@ -162,7 +164,12 @@ export const InboxClient = ({
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" disabled={!data}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={!data}
+                      onClick={onOpen}
+                    >
                       <Forward className="h-4 w-4" />
                       <span className="sr-only">Forward</span>
                     </Button>
@@ -189,8 +196,13 @@ export const InboxClient = ({
                 >
                   Mark as unread
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => router.push(`/inbox/${data?.id}`)}
+                >
+                  Details mail
+                </DropdownMenuItem>
                 <DropdownMenuItem>Star thread</DropdownMenuItem>
-                <DropdownMenuItem>Add label</DropdownMenuItem>
                 <DropdownMenuItem>Mute thread</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

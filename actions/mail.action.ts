@@ -67,7 +67,7 @@ export const createMail = async (
 
 export const updateMail = async (
   values: Partial<Mail>,
-  labels: Option[],
+  labels?: Option[],
   timelineStatus?: string
 ) => {
   const currentUser = await getCurrentUser();
@@ -89,15 +89,27 @@ export const updateMail = async (
     content: values.content,
     mailCode: values.mailCode,
     isDrafted: values.isDrafted,
-    senderId: currentUser.id,
   };
 
   let updatedMail = {};
 
-  if (labels.length > 0) {
+  // later, we should update the `WHERE` query parameters.
+  if (labels?.length! > 0) {
     updatedMail = await prismadb.mail.update({
       where: {
         id: mailId,
+        AND: [
+          {
+            OR: [
+              {
+                recipientId: currentUser.id,
+              },
+              {
+                senderId: currentUser.id,
+              },
+            ],
+          },
+        ],
       },
       data: {
         ...validData,
@@ -113,13 +125,25 @@ export const updateMail = async (
             },
           ],
         },
-        labels: { connect: labels.map((item) => ({ id: item.value })) },
+        labels: { connect: labels?.map((item) => ({ id: item.value })) },
       },
     });
   } else {
     updatedMail = await prismadb.mail.update({
       where: {
         id: mailId,
+        AND: [
+          {
+            OR: [
+              {
+                recipientId: currentUser.id,
+              },
+              {
+                senderId: currentUser.id,
+              },
+            ],
+          },
+        ],
       },
       data: {
         ...validData,
@@ -141,7 +165,13 @@ export const updateMail = async (
 
   revalidatePath(`/mails/${mailId}`);
 
-  return JSON.parse(JSON.stringify({ data: updatedMail, status: 200 }));
+  return JSON.parse(
+    JSON.stringify({
+      data: updatedMail,
+      message: 'Success forwarding mail',
+      status: 200,
+    })
+  );
 };
 
 export const markAsRead = async (mailId: string) => {

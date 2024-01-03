@@ -1,7 +1,7 @@
 'use client';
 
 import { useIsClient } from 'usehooks-ts';
-import { SearchModal } from '../modals/search-modal';
+import { ForwardModal } from '@/components/modals/forward-modal';
 
 export const ModalProvider = () => {
   const isClient = useIsClient();
@@ -12,7 +12,7 @@ export const ModalProvider = () => {
 
   return (
     <>
-      <SearchModal />
+      <ForwardModal />
     </>
   );
 };

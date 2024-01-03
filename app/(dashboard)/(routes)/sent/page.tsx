@@ -31,6 +31,9 @@ const SentPage = async () => {
         include: {
           timeline: true,
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
       },
     },
     orderBy: {

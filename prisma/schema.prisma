@@ -67,9 +67,9 @@ model Timeline {
 
 model MailTimeline {
   mailId     String
-  mail       Mail     @relation(fields: [mailId], references: [id])
+  mail       Mail     @relation(fields: [mailId], references: [id], onDelete: Cascade)
   timelineId String
-  timeline   Timeline @relation(fields: [timelineId], references: [id])
+  timeline   Timeline @relation(fields: [timelineId], references: [id], onDelete: Cascade)
 
   assignedBy String
   createdAt  DateTime @default(now())
