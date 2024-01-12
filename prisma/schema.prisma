@@ -26,8 +26,9 @@ model User {
   phone       String?
   address     String?   @db.Text
 
-  sentMails     Mail[] @relation("Sender")
-  receivedMails Mail[] @relation("Recipient")
+  sentMails     Mail[]     @relation("Sender")
+  receivedMails Mail[]     @relation("Recipient")
+  documents     Document[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -83,6 +84,20 @@ model Label {
   name String @unique
 
   mails Mail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Document {
+  id          String  @id @default(uuid())
+  title       String
+  content     String? @db.Text
+  isPublished Boolean @default(false)
+  imageUrl    String?
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

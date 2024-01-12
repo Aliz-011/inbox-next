@@ -63,9 +63,9 @@ const mainRoutes = [
 
 const secondaryRoutes = [
   {
-    title: 'Social',
+    title: 'Collab',
     label: '',
-    href: '/social',
+    href: '/collab',
     icon: Users2,
   },
   {

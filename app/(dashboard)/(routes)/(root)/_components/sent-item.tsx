@@ -40,7 +40,7 @@ export const SentItem = ({ mail }: { mail: Mail & { recipient: User } }) => {
         <p className="text-xs text-muted-foreground truncate">{mail.content}</p>
         <Button
           className="w-full"
-          onClick={() => router.push(`/mails/${mail.id}`)}
+          onClick={() => router.push(`/mail/${mail.id}`)}
         >
           View details
         </Button>

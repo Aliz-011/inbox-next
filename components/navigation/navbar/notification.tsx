@@ -1,11 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Fragment, useTransition } from 'react';
+import { Fragment } from 'react';
 import { Bell } from 'lucide-react';
 import { Mail, User } from '@prisma/client';
 import { formatDistanceToNow } from 'date-fns';
-import { toast } from 'sonner';
 
 import {
   DropdownMenu,
@@ -23,7 +22,6 @@ export const Notification = ({
   notifications: (Mail & { sender: User })[];
 }) => {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
 
   return (
     <DropdownMenu>
