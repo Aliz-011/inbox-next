@@ -47,7 +47,7 @@ export const InboxClient = ({
   const { data, onSelect } = useInbox((state) => state);
   const { onOpen } = useForwardModal((state) => state);
 
-  const onClickMarkAsRead = (id: string) => {
+  const handleMarkAsRead = (id: string) => {
     try {
       startTransition(() => {
         markAsRead(id).then((data) => {
@@ -55,7 +55,7 @@ export const InboxClient = ({
             toast.error(data.message);
             return;
           }
-          toast.success('Message is readed');
+          toast.success('Readed');
           router.refresh();
         });
       });
@@ -192,9 +192,9 @@ export const InboxClient = ({
                 <DropdownMenuItem
                   className="cursor-pointer"
                   disabled={data?.isRead}
-                  onClick={() => onClickMarkAsRead(data?.id!)}
+                  onClick={() => handleMarkAsRead(data?.id!)}
                 >
-                  Mark as unread
+                  Mark as read
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer"
@@ -227,7 +227,7 @@ export const InboxClient = ({
                     <div className="font-semibold">{data?.sender.name}</div>
                     <div className="line-clamp-1 text-xs">{data.title}</div>
                     <div className="line-clamp-1 text-xs">
-                      <span className="font-medium">Reply-To:</span>{' '}
+                      <span className="font-medium">To:</span>{' '}
                       {currentUser?.email}
                     </div>
                   </div>

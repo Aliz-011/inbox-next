@@ -6,7 +6,6 @@ import {
   DialogDescription,
   DialogTitle,
   DialogPortal,
-  DialogOverlay,
   DialogHeader,
 } from '@/components/ui/dialog';
 
@@ -14,7 +13,7 @@ interface ModalProps {
   isOpen: boolean;
   onChange: (open: boolean) => void;
   title: string;
-  description: string;
+  description?: string;
   children: React.ReactNode;
 }
 
@@ -28,7 +27,6 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <Dialog open={isOpen} defaultOpen={isOpen} onOpenChange={onChange}>
       <DialogPortal>
-        <DialogOverlay className="backdrop-blur-sm fixed inset-0" />
         <DialogContent
           className="
             fixed 

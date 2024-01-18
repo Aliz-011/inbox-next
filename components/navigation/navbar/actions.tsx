@@ -16,6 +16,7 @@ import {
 import { Search } from './search';
 import { Notification } from './notification';
 import { Button } from '@/components/ui/button';
+import { ModeToggle } from '@/components/mode-toggle';
 
 import { Mail, User } from '@prisma/client';
 
@@ -31,6 +32,7 @@ export const Actions = ({
   return (
     <div className="flex items-center gap-x-4">
       <Search />
+      <ModeToggle />
 
       <Notification notifications={data} />
 

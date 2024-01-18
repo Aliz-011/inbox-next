@@ -62,7 +62,7 @@ export const createMail = async (
 
   revalidatePath('/mails/new');
 
-  return JSON.parse(JSON.stringify({ data: newMail, status: 201 }));
+  return { data: newMail, status: 201 };
 };
 
 export const updateMail = async (
@@ -79,9 +79,7 @@ export const updateMail = async (
   const mailId = values.id;
 
   if (!mailId) {
-    return JSON.parse(
-      JSON.stringify({ message: 'Mail id required', status: 400 })
-    );
+    return { message: 'Mail id required', status: 400 };
   }
 
   const validData = {
@@ -165,13 +163,11 @@ export const updateMail = async (
 
   revalidatePath(`/mails/${mailId}`);
 
-  return JSON.parse(
-    JSON.stringify({
-      data: updatedMail,
-      message: 'Success forwarding mail',
-      status: 200,
-    })
-  );
+  return {
+    data: updatedMail,
+    message: 'Success forwarding mail',
+    status: 200,
+  };
 };
 
 export const markAsRead = async (mailId: string) => {
@@ -193,9 +189,7 @@ export const markAsRead = async (mailId: string) => {
   });
 
   if (mailAlreadyReaded) {
-    return JSON.parse(
-      JSON.stringify({ message: 'Message already readed', status: 400 })
-    );
+    return { message: 'Message already readed', status: 400 };
   }
 
   const updateReadMessage = await prismadb.mail.update({
@@ -212,9 +206,50 @@ export const markAsRead = async (mailId: string) => {
     },
   });
 
-  revalidatePath('/inbox');
+  revalidatePath('/inbox', 'page');
 
-  return JSON.parse(JSON.stringify({ data: updateReadMessage, status: 200 }));
+  return { data: updateReadMessage, status: 200 };
+};
+
+export const archiveMessage = async (mailId: string) => {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return redirect('/sign-in');
+  }
+
+  const mailAlreadyArchived = await prismadb.mail.findFirst({
+    where: {
+      id: mailId,
+      AND: [
+        {
+          isArchived: true,
+        },
+      ],
+    },
+  });
+
+  if (mailAlreadyArchived) {
+    return { message: 'Mail already archived', status: 400 };
+  }
+
+  const archive = await prismadb.mail.update({
+    where: {
+      id: mailId,
+      AND: [
+        {
+          senderId: currentUser.id,
+        },
+      ],
+    },
+    data: {
+      isArchived: true,
+    },
+  });
+
+  revalidatePath('/sent', 'page');
+
+  return { data: archive, status: 200, message: 'Archived' };
 };
 
 export const softDelete = async (id: string) => {
@@ -225,9 +260,7 @@ export const softDelete = async (id: string) => {
   }
 
   if (!id) {
-    return JSON.parse(
-      JSON.stringify({ message: 'No id provided', status: 400 })
-    );
+    return { message: 'No id provided', status: 400 };
   }
 
   const softDeleteMail = await prismadb.mail.update({
@@ -255,7 +288,7 @@ export const softDelete = async (id: string) => {
   revalidatePath(`/inbox/${id}`);
   revalidatePath('/sent');
 
-  return JSON.parse(JSON.stringify({ data: softDeleteMail, status: 200 }));
+  return { data: softDeleteMail, status: 200 };
 };
 
 export const deletePermanently = async (id: string) => {
@@ -266,9 +299,7 @@ export const deletePermanently = async (id: string) => {
   }
 
   if (!id) {
-    return JSON.parse(
-      JSON.stringify({ message: 'No id provided', status: 400 })
-    );
+    return { message: 'No id provided', status: 400 };
   }
 
   await prismadb.mail.delete({
@@ -291,5 +322,5 @@ export const deletePermanently = async (id: string) => {
 
   revalidatePath('/sent');
 
-  return JSON.parse(JSON.stringify({ message: 'Mail deleted.', status: 200 }));
+  return { message: 'Mail deleted.', status: 200 };
 };

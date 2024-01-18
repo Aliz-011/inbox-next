@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -77,6 +77,7 @@ export const MailForm = ({
 }) => {
   const router = useRouter();
   const params = useParams();
+  const [formModified, setFormModified] = useState(false);
   const [file, setFile] = useState<File>();
   const [url, setUrl] = useState('');
   const [selectedLabels, setSelectedLabels] = useState<Option[]>([]);
@@ -151,6 +152,24 @@ export const MailForm = ({
       toast.error(error.message);
     }
   }
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (formModified) {
+        const confirmationMessage =
+          'You have unsaved changes. Are you sure you want to leave?';
+        event.returnValue = confirmationMessage;
+        return confirmationMessage;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [formModified]);
 
   const handleDelete = () => {
     try {
@@ -238,7 +257,9 @@ export const MailForm = ({
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Subject</FormLabel>
+                <FormLabel>
+                  Subject <sup className="text-red-500">*</sup>
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Subject..."
@@ -255,7 +276,9 @@ export const MailForm = ({
             name="mailCode"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mail Code</FormLabel>
+                <FormLabel>
+                  Mail Code <sup className="text-red-500">*</sup>
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="e.g. SK0-xxx"
@@ -269,7 +292,9 @@ export const MailForm = ({
           />
           <div className="flex flex-col md:flex-row md:items-center mdjustify-between gap-4">
             <div className="w-full md:w-2/3">
-              <Label>Labels</Label>
+              <Label>
+                Labels <sup className="text-red-500">*</sup>
+              </Label>
               <Select
                 isMulti
                 isSearchable
@@ -294,7 +319,9 @@ export const MailForm = ({
               name="recipientId"
               render={({ field }) => (
                 <FormItem className="flex flex-col mt-0 md:mt-2 w-full md:w-1/3">
-                  <FormLabel>Mail to</FormLabel>
+                  <FormLabel>
+                    Mail to <sup className="text-red-500">*</sup>
+                  </FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -351,7 +378,7 @@ export const MailForm = ({
               )}
             />
           </div>
-          <FormField
+          {/* <FormField
             control={form.control}
             name="content"
             render={({ field }) => (
@@ -372,9 +399,9 @@ export const MailForm = ({
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
 
-          {/* <FormField
+          <FormField
             control={form.control}
             name="content"
             render={({ field }) => (
@@ -391,7 +418,7 @@ export const MailForm = ({
                 </FormDescription>
               </FormItem>
             )}
-          /> */}
+          />
 
           <div className="grid gap-2">
             <Label>Attachment</Label>
@@ -404,6 +431,10 @@ export const MailForm = ({
               }}
               disabled={isPending}
             />
+            <FormDescription>
+              You do not have to provide an attachment, it is optional and you
+              can just send your mail.
+            </FormDescription>
           </div>
           <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="animate-spin mr-2 h-4 w-4" />}

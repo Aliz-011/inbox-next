@@ -25,7 +25,7 @@ export const SentList = ({
       {/* Create new mail box */}
 
       <div
-        onClick={() => router.push('/mails/new')}
+        onClick={() => router.push('/mail/new')}
         className="flex flex-col p-6 items-center justify-center shadow border-[1px] border-dashed rounded hover:bg-gray-100 transition cursor-pointer"
       >
         <FilePlus2 size={35} className="text-muted-foreground" />

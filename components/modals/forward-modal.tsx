@@ -15,7 +15,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Modal } from '@/components/modals/modal';
@@ -82,12 +81,7 @@ export const ForwardModal = () => {
   };
 
   return (
-    <Modal
-      title="Forward mail"
-      description="Forward this mail to the right person."
-      isOpen={isOpen}
-      onChange={onClose}
-    >
+    <Modal title="Forward" isOpen={isOpen} onChange={onClose}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleForwardMessage)}>
           <div className="flex flex-col gap-4">
@@ -100,14 +94,13 @@ export const ForwardModal = () => {
                   <FormControl>
                     <Textarea
                       disabled={isPending}
-                      placeholder="The purpose of this mail"
+                      placeholder="e.g. Mail received"
                       className="resize-none"
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    You can <span>@mention</span> other users and organizations
-                    to link to them.
+                    The status you set will be informed to the sender.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

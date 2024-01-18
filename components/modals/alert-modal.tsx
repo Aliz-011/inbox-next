@@ -35,10 +35,9 @@ export const AlertModal = ({
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+            You can still restore this mail inside the trash folder.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

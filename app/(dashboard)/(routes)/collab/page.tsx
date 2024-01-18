@@ -8,7 +8,7 @@ const CollabPage = async () => {
   const currentUser = await getCurrentUser();
   const documents = await prismadb.document.findMany({
     where: {
-      userId: currentUser?.id,
+      ownerId: currentUser?.id,
     },
     orderBy: {
       createdAt: 'desc',

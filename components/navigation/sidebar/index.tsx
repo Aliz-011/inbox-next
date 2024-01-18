@@ -3,12 +3,10 @@
 import {
   AlertCircle,
   Archive,
-  File,
   Inbox,
   LayoutGrid,
   MessagesSquare,
   Send,
-  ShoppingCart,
   Trash2,
   Users2,
   Settings,
@@ -28,12 +26,6 @@ const mainRoutes = [
     label: '',
     href: '/',
     icon: LayoutGrid,
-  },
-  {
-    title: 'Drafts',
-    label: '',
-    href: '/drafts',
-    icon: File,
   },
   {
     title: 'Inbox',
@@ -79,12 +71,6 @@ const secondaryRoutes = [
     label: '',
     href: '/forums',
     icon: MessagesSquare,
-  },
-  {
-    title: 'Shopping',
-    label: '',
-    href: '/shopping',
-    icon: ShoppingCart,
   },
   {
     title: 'Setting',

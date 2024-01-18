@@ -32,7 +32,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label, Mail, MailTimeline, Timeline, User } from '@prisma/client';
 import { useSent } from '@/hooks/use-sent';
 import { cn } from '@/lib/utils';
-import { softDelete } from '@/actions/mail.action';
+import { archiveMessage, softDelete } from '@/actions/mail.action';
 
 export const SentClient = ({
   mails,
@@ -60,6 +60,24 @@ export const SentClient = ({
           toast.success('Mail Deleted');
           router.refresh();
           onUnSelect();
+        });
+      });
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
+
+  const handelArchive = (id: string) => {
+    try {
+      startTransition(() => {
+        archiveMessage(id).then((data) => {
+          if (data.status !== 200) {
+            toast.error('Something went error');
+            return;
+          }
+          toast.success(data.message);
+          router.refresh();
         });
       });
     } catch (error: any) {
@@ -210,11 +228,16 @@ export const SentClient = ({
                     disabled={data?.isRead}
                     onClick={() => handleDelete(data?.id!)}
                   >
-                    Delete Mail
+                    Delete
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    disabled={data?.isArchived}
+                    onClick={() => handelArchive(data?.id!)}
+                  >
+                    Archive
                   </DropdownMenuItem>
                   <DropdownMenuItem>Star thread</DropdownMenuItem>
-                  <DropdownMenuItem>Add label</DropdownMenuItem>
-                  <DropdownMenuItem>Mute thread</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -241,7 +264,8 @@ export const SentClient = ({
                         <div className="line-clamp-1 text-xs">{data.title}</div>
                         <div className="line-clamp-1 text-xs">
                           <span className="font-medium">Sent-To:</span>{' '}
-                          {data?.recipient.name}
+                          {data?.recipient.name}{' '}
+                          {data?.isArchived ? '(archived)' : undefined}
                         </div>
                       </div>
                     </div>
@@ -301,7 +325,10 @@ export const SentClient = ({
                             addSuffix: true,
                             includeSeconds: true,
                           })}{' '}
-                          by {timeline.assignedBy}
+                          by{' '}
+                          {timeline.assignedBy === currentUser?.name
+                            ? 'Me'
+                            : timeline.assignedBy}
                         </p>
                       </div>
                     </div>

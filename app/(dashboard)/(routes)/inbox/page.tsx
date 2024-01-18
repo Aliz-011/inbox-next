@@ -20,6 +20,9 @@ const InboxPage = async () => {
         {
           isDeleted: false,
         },
+        {
+          isArchived: false,
+        },
       ],
     },
     include: {

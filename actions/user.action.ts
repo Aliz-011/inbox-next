@@ -14,7 +14,7 @@ export const updateUser = async (values: Partial<User>) => {
     values;
 
   if (!currentUser) {
-    return JSON.parse(JSON.stringify({ message: 'Not a valid user' }));
+    return { message: 'Not a valid user' };
   }
 
   let user = {};
@@ -59,12 +59,10 @@ export const registerUser = async (values: Partial<User>) => {
   });
 
   if (existingUser) {
-    return JSON.parse(
-      JSON.stringify({
-        message: 'User with this email already exist',
-        status: 409,
-      })
-    );
+    return {
+      message: 'User with this email already exist',
+      status: 409,
+    };
   }
 
   const hashedPassword = await bcrypt.hash(values.password!, 12);
@@ -81,5 +79,5 @@ export const registerUser = async (values: Partial<User>) => {
     },
   });
 
-  return JSON.parse(JSON.stringify({ user: newUser }));
+  return { user: newUser };
 };

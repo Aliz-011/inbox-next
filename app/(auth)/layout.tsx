@@ -18,7 +18,7 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
             <span className="text-xl font-medium">Schubert</span>
           </div>
         </div>
-        <div className="w-full sm:w-2/3 lg:w-1/2 flex items-center justify-center h-full">
+        <div className="w-full lg:w-1/2 flex items-center justify-center h-full">
           {children}
         </div>
       </div>

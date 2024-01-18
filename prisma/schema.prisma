@@ -35,23 +35,26 @@ model User {
 }
 
 model Mail {
-  id         String  @id @default(uuid())
-  title      String
-  content    String? @db.Text
-  mailCode   String? @unique @db.Text
-  isRead     Boolean @default(false)
-  isDrafted  Boolean @default(false)
-  isDeleted  Boolean @default(false)
-  isArchived Boolean @default(false)
-  attachment String? @db.Text
-
+  id          String  @id @default(uuid())
+  title       String
+  content     String? @db.Text
+  mailCode    String? @unique @db.Text
+  isRead      Boolean @default(false)
+  isDrafted   Boolean @default(false)
+  isDeleted   Boolean @default(false)
+  isArchived  Boolean @default(false)
+  attachment  String? @db.Text
   senderId    String
-  sender      User   @relation(name: "Sender", fields: [senderId], references: [id])
+  sender      User    @relation(name: "Sender", fields: [senderId], references: [id])
   recipientId String
-  recipient   User   @relation(name: "Recipient", fields: [recipientId], references: [id])
+  recipient   User    @relation(name: "Recipient", fields: [recipientId], references: [id])
 
   labels    Label[]
   timelines MailTimeline[]
+
+  originalMailId String? @unique
+  originalMail   Mail?   @relation(name: "ForwardedMail", fields: [originalMailId], references: [id])
+  forwardedMail  Mail?   @relation("ForwardedMail")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
