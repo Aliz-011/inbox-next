@@ -5,7 +5,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { formatDistanceToNow, format } from 'date-fns';
-import { Forward, MoreVertical, Reply, ReplyAll } from 'lucide-react';
+import {
+  Forward,
+  MoreVertical,
+  Reply,
+  ReplyAll,
+  PlusCircle,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -89,10 +95,17 @@ export const SentClient = ({
   return (
     <>
       <ResizablePanel defaultSize={75} minSize={35} className="p-6 space-y-4">
-        <Heading
-          title="Sent"
-          description="The mails you sent to someone you may know."
-        />
+        <div className="flex items-center justify-between">
+          <Heading
+            title="Sent"
+            description="The mails you sent to someone you may know."
+          />
+          <Button onClick={() => router.push('/mail/new')}>
+            <PlusCircle className="h-5 w-5 mr-2" />
+            Compose
+          </Button>
+        </div>
+        <Separator />
 
         {mails.length > 0 ? (
           <ScrollArea className="h-[80vh]">
@@ -186,24 +199,6 @@ export const SentClient = ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button variant="ghost" size="icon" disabled={!data}>
-                        <Reply className="h-4 w-4" />
-                        <span className="sr-only">Reply</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Reply</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" disabled={!data}>
-                        <ReplyAll className="h-4 w-4" />
-                        <span className="sr-only">Reply all</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Reply all</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" disabled={!data}>
                         <Forward className="h-4 w-4" />
                         <span className="sr-only">Forward</span>
                       </Button>
@@ -236,6 +231,13 @@ export const SentClient = ({
                     onClick={() => handelArchive(data?.id!)}
                   >
                     Archive
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    disabled={data?.isArchived}
+                    onClick={() => router.push(`/mail/${data?.id}`)}
+                  >
+                    Edit
                   </DropdownMenuItem>
                   <DropdownMenuItem>Star thread</DropdownMenuItem>
                 </DropdownMenuContent>

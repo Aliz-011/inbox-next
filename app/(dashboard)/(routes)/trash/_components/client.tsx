@@ -30,7 +30,7 @@ import { Button } from '@/components/ui/button';
 import { useTrashMail } from '@/hooks/use-trash-mail';
 import { cn } from '@/lib/utils';
 import { Label, Mail, User } from '@prisma/client';
-import { deletePermanently } from '@/actions/mail.action';
+import { deletePermanently, putBack } from '@/actions/mail.action';
 
 export const TrashClient = ({
   mails,
@@ -46,20 +46,41 @@ export const TrashClient = ({
   const handleDelete = (id: string) => {
     try {
       startTransition(() => {
-        deletePermanently(id).then((data) => {
-          if (data.status !== 200) {
-            toast.error(data.message);
-            return;
-          }
-          toast.success(data.message);
-          router.refresh();
-          onUnSelect();
-        });
+        deletePermanently(id)
+          .then((data) => {
+            if (data.status !== 200) {
+              toast.error(data.message);
+              return;
+            }
+            toast.success(data.message);
+            router.refresh();
+            onUnSelect();
+          })
+          .catch((err) => {
+            toast.error(err.message);
+          });
       });
     } catch (error) {
       console.log(error);
       toast.error('Something went wrong');
     }
+  };
+
+  const handlePutBack = (id: string) => {
+    startTransition(() => {
+      putBack(id)
+        .then((data) => {
+          if (data.status !== 200) {
+            throw new Error(data.message);
+          }
+          toast.success(data.message);
+          router.refresh();
+          onUnSelect();
+        })
+        .catch((error) => {
+          toast.error(error.message);
+        });
+    });
   };
 
   return (
@@ -185,9 +206,13 @@ export const TrashClient = ({
                     >
                       Delete permanently
                     </DropdownMenuItem>
-                    <DropdownMenuItem>Star thread</DropdownMenuItem>
-                    <DropdownMenuItem>Add label</DropdownMenuItem>
-                    <DropdownMenuItem>Mute thread</DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      disabled={data?.isRead}
+                      onClick={() => handlePutBack(data?.id!)}
+                    >
+                      Put back
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

@@ -7,17 +7,13 @@ const es = initEdgeStore.create();
  */
 const edgeStoreRouter = es.router({
   publicFiles: es.fileBucket({
-    maxSize: 1024 * 1024 * 2,
-    accept: [
-      'image/*',
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-excel',
-      'application/zip',
-    ],
+    maxSize: 1024 * 1024 * 4,
+    accept: ['image/*', 'application/pdf', 'application/zip'],
   }),
-  publicImages: es.imageBucket(),
+  publicImages: es.imageBucket({
+    maxSize: 1024 * 1024 * 1,
+    accept: ['image/*'],
+  }),
 });
 const handler = createEdgeStoreNextHandler({
   router: edgeStoreRouter,

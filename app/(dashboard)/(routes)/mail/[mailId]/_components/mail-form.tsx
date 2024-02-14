@@ -48,7 +48,10 @@ import { Editor } from '@/components/editor';
 import { createMail, softDelete, updateMail } from '@/actions/mail.action';
 import { cn } from '@/lib/utils';
 import { useEdgeStore } from '@/lib/edgestore';
-import { SingleImageDropzone } from '@/components/image-uploader/single-image-dropzone';
+import {
+  MultiFileDropzone,
+  type FileState,
+} from '@/components/dropzone/multi-file-dropzone';
 import { Label } from '@/components/ui/label';
 import { AlertModal } from '@/components/modals/alert-modal';
 
@@ -78,7 +81,7 @@ export const MailForm = ({
   const router = useRouter();
   const params = useParams();
   const [formModified, setFormModified] = useState(false);
-  const [file, setFile] = useState<File>();
+  const [file, setFile] = useState<FileState[]>([]);
   const [url, setUrl] = useState('');
   const [selectedLabels, setSelectedLabels] = useState<Option[]>([]);
   const { edgestore } = useEdgeStore();
@@ -92,6 +95,19 @@ export const MailForm = ({
 
   const action = initialData ? 'Save changes' : 'Create';
   const toastMessage = initialData ? 'Mail updated' : 'Mail created';
+
+  function updateFileProgress(key: string, progress: FileState['progress']) {
+    setFile((fileStates) => {
+      const newFileStates = structuredClone(fileStates);
+      const fileState = newFileStates.find(
+        (fileState) => fileState.key === key
+      );
+      if (fileState) {
+        fileState.progress = progress;
+      }
+      return newFileStates;
+    });
+  }
 
   const form = useForm<MailFormValues>({
     resolver: zodResolver(formSchema),
@@ -110,11 +126,6 @@ export const MailForm = ({
 
   async function onSubmit(values: MailFormValues) {
     try {
-      if (file) {
-        const res = await edgestore.publicImages.upload({ file });
-        setUrl(res.url);
-      }
-
       if (!initialData) {
         startTransition(() => {
           createMail({ ...values, attachment: url }, selectedLabels)
@@ -378,7 +389,7 @@ export const MailForm = ({
               )}
             />
           </div>
-          {/* <FormField
+          <FormField
             control={form.control}
             name="content"
             render={({ field }) => (
@@ -399,9 +410,9 @@ export const MailForm = ({
                 <FormMessage />
               </FormItem>
             )}
-          /> */}
+          />
 
-          <FormField
+          {/* <FormField
             control={form.control}
             name="content"
             render={({ field }) => (
@@ -418,16 +429,41 @@ export const MailForm = ({
                 </FormDescription>
               </FormItem>
             )}
-          />
+          /> */}
 
           <div className="grid gap-2">
             <Label>Attachment</Label>
-            <SingleImageDropzone
-              width={400}
-              height={350}
+            <MultiFileDropzone
               value={file}
               onChange={(file) => {
                 setFile(file);
+              }}
+              onFilesAdded={async (addedFiles) => {
+                setFile([...file, ...addedFiles]);
+                await Promise.all(
+                  addedFiles.map(async (addedFileState) => {
+                    try {
+                      const res = await edgestore.publicFiles.upload({
+                        file: addedFileState.file,
+                        onProgressChange: async (progress) => {
+                          updateFileProgress(addedFileState.key, progress);
+                          if (progress === 100) {
+                            // wait 1 second to set it to complete
+                            // so that the user can see the progress bar at 100%
+                            await new Promise((resolve) =>
+                              setTimeout(resolve, 1000)
+                            );
+                            updateFileProgress(addedFileState.key, 'COMPLETE');
+                          }
+                        },
+                      });
+                      console.log(res);
+                      setUrl(res.url);
+                    } catch (err) {
+                      updateFileProgress(addedFileState.key, 'ERROR');
+                    }
+                  })
+                );
               }}
               disabled={isPending}
             />

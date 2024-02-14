@@ -288,7 +288,45 @@ export const softDelete = async (id: string) => {
   revalidatePath(`/inbox/${id}`);
   revalidatePath('/sent');
 
-  return { data: softDeleteMail, status: 200 };
+  return { data: softDeleteMail, status: 200, message: 'Deleted permanently' };
+};
+
+export const putBack = async (id: string) => {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return redirect('/sign-in');
+  }
+
+  if (!id) {
+    return { message: 'No id provided', status: 400 };
+  }
+
+  const softDeleteMail = await prismadb.mail.update({
+    where: {
+      id,
+      AND: [
+        {
+          OR: [
+            {
+              recipientId: currentUser.id,
+            },
+            {
+              senderId: currentUser.id,
+            },
+          ],
+        },
+      ],
+    },
+    data: {
+      isDeleted: false,
+    },
+  });
+
+  revalidatePath('/trash');
+  revalidatePath(`/trash/${id}`);
+
+  return { data: softDeleteMail, status: 200, message: 'Success' };
 };
 
 export const deletePermanently = async (id: string) => {

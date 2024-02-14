@@ -1,5 +1,4 @@
 import { Heading } from '@/components/heading';
-import { SentList } from './_components/sent-list';
 
 import { prismadb } from '@/lib/database';
 import { getCurrentUser } from '@/lib/get-current-user';
@@ -52,7 +51,6 @@ export default async function Home() {
         <CardItem icon={Inbox} title="Total Inbox" total={totalInbox} />
         <CardItem icon={Send} title="Mails Sent" total={totalSents} />
       </div>
-      <SentList data={sents} users={users} />
     </main>
   );
 }
